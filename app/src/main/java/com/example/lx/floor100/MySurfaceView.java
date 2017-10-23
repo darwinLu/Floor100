@@ -47,7 +47,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     int init_player_y;
 
     public Player player;
-//    public Platform floor;
+    public Platform floor;
     public Platform platform;
     private List<Platform> platformList = new ArrayList<Platform>();
 
@@ -79,11 +79,12 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         bg = BitmapFactory.decodeResource(this.getResources(),R.mipmap.bg);
         bmpPlayer = BitmapFactory.decodeResource(this.getResources(), R.mipmap.cat);
         bmpPlatform = BitmapFactory.decodeResource(this.getResources(), R.mipmap.platform);
-//        floor = new Platform(0,screenH,screenW,bmpPlatform);
+        floor = new Platform(0,screenH,screenW,bmpPlatform);
         init_player_x = 0;
         init_player_y = this.getHeight()-bmpPlayer.getHeight();
-        player = new Player(init_player_x,init_player_y,bmpPlayer);
-        setPlatformList();
+        player = new Player(init_player_x,init_player_y,bmpPlayer,floor);
+        player.platform = floor;
+//        setPlatformList();
 //        platformNumber = screenH/(Platform.SPACE+Platform.THICKNESS);
 //        for(int i=0;i<platformNumber;i++){
 //            platformList.add(i,new Platform(i*40,screenH - (i+1)*(Platform.SPACE+Platform.THICKNESS),70,i+1,bmpPlatform));
@@ -117,11 +118,12 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     private void update_game() {
         player.move();
+
         checkCollision(player,platform);
-//        if(player.x > player.platform.x+player.platform.length ||player.x < player.platform.x){
-//            player.jumpSpeed = 0 ;
-//            player.jump();
-//        }
+        if(player.x > player.platform.x+player.platform.length ||player.x +bmpPlayer.getWidth() < player.platform.x){
+            player.jumpSpeed = 0 ;
+            player.jump();
+        }
 //        if(checkCollision(player,platformList)){
 //            player.isJumping = false;
 //        };
@@ -132,6 +134,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         if( player.y < platform.y && player.y+bmpPlayer.getHeight() > platform.y+bmpPlatform.getHeight() && player.x+bmpPlayer.getWidth() > platform.x && player.x < platform.x +bmpPlatform.getWidth()){
             player.y = platform.y - bmpPlayer.getHeight();
             player.isJumping = false;
+            player.platform = platform;
         }
     }
 //    private boolean checkCollision(Player player,List<Platform> platformList){

@@ -43,6 +43,7 @@ public class Player {
 
     //当前主角所在的platform
     public Platform platform;
+    public Platform floor;
     //是否处于平台的标志位
     public boolean isOnPlatform;
 
@@ -53,10 +54,11 @@ public class Player {
 
 
     //构造函数
-    public Player(int init_player_x,int init_player_y,Bitmap bmpPlayer){
+    public Player(int init_player_x,int init_player_y,Bitmap bmpPlayer,Platform floor){
         this.bmpPlayer = bmpPlayer;
         x = init_player_x;
         y = init_player_y;
+        this.floor = floor ;
     }
 
     public void move(){
@@ -72,7 +74,7 @@ public class Player {
                 direction = DIRCTION_RIGHT;
             }
         }
-//        if(x+bmpPlayer.getWidth() < platform.x || x > platform.x + platform.length){
+//        if((x+bmpPlayer.getWidth() < platform.x || x > platform.x + platform.length)){
 //            jumpSpeed = 0;
 //            jump();
 //        }
@@ -110,6 +112,7 @@ public class Player {
                     if(y>MySurfaceView.screenH - bmpPlayer.getHeight()){
                         y = MySurfaceView.screenH - bmpPlayer.getHeight();
                         isJumping = false;
+                        platform = floor;
                     }
 //                    if(vy > 0 ){
 //                        jumpState = isRising;
