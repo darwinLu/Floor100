@@ -45,14 +45,18 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     //主角的初始X、Y位置
     int init_player_x;
     int init_player_y;
+
     public Player player;
-    public Platform floor;
+//    public Platform floor;
     public Platform platform;
     private List<Platform> platformList = new ArrayList<Platform>();
+
+    //图片
     Bitmap bmpPlayer;
     Bitmap bmpPlatform;
     Bitmap bg;
-    int platformNumber;
+
+//    int platformNumber;
 
 
     public MySurfaceView(Context context) {
@@ -68,34 +72,38 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         th.start();
     }
 
-    private void init() {
-        paint = new Paint();
+    private void init_game() {
         screenW = this.getWidth();
         screenH = this.getHeight();
+        paint = new Paint();
+        bg = BitmapFactory.decodeResource(this.getResources(),R.mipmap.bg);
         bmpPlayer = BitmapFactory.decodeResource(this.getResources(), R.mipmap.cat);
         bmpPlatform = BitmapFactory.decodeResource(this.getResources(), R.mipmap.platform);
-        bg = BitmapFactory.decodeResource(this.getResources(),R.mipmap.bg);
-        floor = new Platform(0,screenH,screenW,0,bmpPlatform);
+//        floor = new Platform(0,screenH,screenW,bmpPlatform);
         init_player_x = 0;
         init_player_y = this.getHeight()-bmpPlayer.getHeight();
         player = new Player(init_player_x,init_player_y,bmpPlayer);
-        platformNumber = screenH/(Platform.SPACE+Platform.THICKNESS);
-        for(int i=0;i<platformNumber;i++){
-            platformList.add(i,new Platform(i*40,screenH - (i+1)*(Platform.SPACE+Platform.THICKNESS),70,i+1,bmpPlatform));
-        }
-        player.platform = floor;
+        setPlatformList();
+//        platformNumber = screenH/(Platform.SPACE+Platform.THICKNESS);
+//        for(int i=0;i<platformNumber;i++){
+//            platformList.add(i,new Platform(i*40,screenH - (i+1)*(Platform.SPACE+Platform.THICKNESS),70,i+1,bmpPlatform));
+//        }
+//        player.platform = floor;
+        platform = new Platform(screenW/2,screenH/2,200,bmpPlatform);
+//        player.isOnPlatform = true;
         game_is_running = true;
     }
 
-    private void myDraw() {
+    private void display_game() {
         try {
             canvas = sfh.lockCanvas();
             if (canvas != null) {
                 canvas.drawColor(Color.BLACK);
                 canvas.drawBitmap(bg,0,0,paint);
-                for(int i=0;i<platformNumber;i++){
-                    platformList.get(i).platformDraw(canvas,paint);
-                }
+                platform.platformDraw(canvas,paint);
+//                for(int i=0;i<10;i++){
+//                    platformList.get(i).platformDraw(canvas,paint);
+//                }
                 player.playerDraw(canvas,paint);
             }
         } catch (Exception e) {
@@ -107,37 +115,48 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
-    private void logic() {
+    private void update_game() {
         player.move();
-        if(checkCollision(player,platformList)){
-            player.isJumping = false;
-        };
+        checkCollision(player,platform);
+//        if(player.x > player.platform.x+player.platform.length ||player.x < player.platform.x){
+//            player.jumpSpeed = 0 ;
+//            player.jump();
+//        }
+//        if(checkCollision(player,platformList)){
+//            player.isJumping = false;
+//        };
     }
 
 
-    private boolean checkCollision(Player player,List<Platform> platformList){
-        for(int i=0;i<platformNumber;i++){
-            if(player.y + bmpPlayer.getHeight() > platformList.get(i).y && (player.jumpState == player.isFalling)){
-                player.isJumping = false;
-                player.platform = platformList.get(i);
-                return true;
-            }
-        }
-        if(player.y + bmpPlayer.getHeight() > floor.y){
+    private void checkCollision (Player player,Platform platform){
+        if( player.y < platform.y && player.y+bmpPlayer.getHeight() > platform.y+bmpPlatform.getHeight() && player.x+bmpPlayer.getWidth() > platform.x && player.x < platform.x +bmpPlatform.getWidth()){
+            player.y = platform.y - bmpPlayer.getHeight();
             player.isJumping = false;
-            player.platform = floor;
-            return true;
         }
-        return false;
     }
+//    private boolean checkCollision(Player player,List<Platform> platformList){
+//        for(int i=0;i<platformNumber;i++){
+//            if(player.y + bmpPlayer.getHeight() > platformList.get(i).y && (player.jumpState == player.isFalling)){
+//                player.isJumping = false;
+//                player.platform = platformList.get(i);
+//                return true;
+//            }
+//        }
+//        if(player.y + bmpPlayer.getHeight() > floor.y){
+//            player.isJumping = false;
+//            player.platform = floor;
+//            return true;
+//        }
+//        return false;
+//    }
 
     @Override
     public void run() {
-        init();
+        init_game();
         while (game_is_running) {
             long start = System.currentTimeMillis();
-            myDraw();
-            logic();
+            display_game();
+            update_game();
             long end = System.currentTimeMillis();
             try {
                 if (end - start < DELTA_TIME) {
@@ -161,11 +180,19 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if(event.getAction()==MotionEvent.ACTION_DOWN){
+            player.jumpSpeed = 20 ;
+        }
         if(event.getAction()==MotionEvent.ACTION_UP){
-            Log.e("Touch","on Touch Event");
-            player.jumpSpeed = 10000;
             player.jump();
         }
         return true;
+    }
+
+    private List<Platform> setPlatformList (){
+        for(int i=0;i<10;i++){
+            platformList.add(new Platform(0,100*i,200,bmpPlatform));
+        }
+        return platformList;
     }
 }

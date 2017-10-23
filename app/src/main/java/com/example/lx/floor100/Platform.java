@@ -16,20 +16,20 @@ public class Platform {
     //平台长度
     public int length;
     //平台序号
-    public int number;
+//    public int number;
     //平台图片
     private Bitmap bmpPlatform;
     //平台间距
-    static public int SPACE = 60;
+//    static public int SPACE = 60;
     //平台厚度
-    static public int THICKNESS = 20;
+//    static public int THICKNESS = 20;
 
 
-    public Platform(int platform_x, int platform_y, int length, int number, Bitmap bmpPlatform) {
+    public Platform(int platform_x, int platform_y, int length, Bitmap bmpPlatform) {
         this.x = platform_x;
         this.y = platform_y;
         this.length = length;
-        this.number = number;
+//        this.number = number;
         this.bmpPlatform = bmpPlatform;
     }
 

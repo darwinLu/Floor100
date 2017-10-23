@@ -22,9 +22,9 @@ public class Player {
     //垂直方向起跳初速度,单位dpi/s
     public int jumpSpeed;
     //重力加速度,单位m/s2，方向向下
-    public int g = -10000000;
+    public double g = -10;
     //垂直方向实时速度
-    private int vy;
+    private double vy;
 
     //水平方向常量
     private final int DIRCTION_LEFT = 0;
@@ -35,14 +35,16 @@ public class Player {
     //跳跃状态标志
     public boolean isJumping;
     //跳跃所处位置标志
-    public boolean jumpState;
+//    public boolean jumpState;
     //处于上升段标志
-    final boolean isRising = true;
+    public boolean isRising = false;
     //处于下降段标志
-    final boolean isFalling = false;
+    public boolean isFalling = false;
 
     //当前主角所在的platform
     public Platform platform;
+    //是否处于平台的标志位
+    public boolean isOnPlatform;
 
     //主角图片（由构造函数传入）
     private Bitmap bmpPlayer;
@@ -70,10 +72,10 @@ public class Player {
                 direction = DIRCTION_RIGHT;
             }
         }
-        if(x+bmpPlayer.getWidth() < platform.x || x > platform.x + platform.length){
-            jumpSpeed = 0;
-            jump();
-        }
+//        if(x+bmpPlayer.getWidth() < platform.x || x > platform.x + platform.length){
+//            jumpSpeed = 0;
+//            jump();
+//        }
     }
 
 
@@ -89,7 +91,10 @@ public class Player {
     }
 
     public void jump() {
+//        isOnPlatform = false;
         isJumping = true;
+        isRising = true;
+        isFalling = false;
         vy = jumpSpeed;
         new Thread(new Runnable() {
             @Override
@@ -97,7 +102,15 @@ public class Player {
                 while (isJumping) {
                     long start = System.currentTimeMillis();
                     vy = vy + MySurfaceView.DELTA_TIME * g / 1000;
-                    y = y - (vy * MySurfaceView.DELTA_TIME / 1000 + (g/2)*MySurfaceView.DELTA_TIME*MySurfaceView.DELTA_TIME/1000/1000);
+                    if(vy < 0){
+                        isRising = false;
+                        isFalling = true;
+                    }
+                    y = y - (int)((MySurfaceView.screenH/100)*((vy * MySurfaceView.DELTA_TIME / 1000 + (g/2)*MySurfaceView.DELTA_TIME*MySurfaceView.DELTA_TIME/1000/1000)));
+                    if(y>MySurfaceView.screenH - bmpPlayer.getHeight()){
+                        y = MySurfaceView.screenH - bmpPlayer.getHeight();
+                        isJumping = false;
+                    }
 //                    if(vy > 0 ){
 //                        jumpState = isRising;
 //                        vy = vy + MySurfaceView.DELTA_TIME * g / 1000;
