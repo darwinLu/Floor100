@@ -1,0 +1,37 @@
+package com.example.lx.floor100;
+
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+
+/**
+ * Created by lx on 2018-08-08.
+ */
+
+public class SpringPlatform extends Platform {
+
+    public SpringPlatform(int platform_x, int platform_y, int length, Bitmap bmpPlatform) {
+        super(platform_x, platform_y, length, bmpPlatform);
+    }
+
+    @Override
+    public void platformDraw(Canvas canvas) {
+        Paint paint = new Paint();
+        paint.setColor(Color.BLUE);
+        if(isOnScreen) {
+            //canvas.drawBitmap(bmpPlatform,x,y,paint);
+            canvas.drawRect(x, y, x + length, y + THICKNESS, paint);
+        }
+    }
+
+    @Override
+    public void update(MySurfaceView view) {
+        super.update(view);
+    }
+
+    @Override
+    public void addEffectToPlayer(MySurfaceView view) {
+        super.addEffectToPlayer(view);
+    }
+}

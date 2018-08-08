@@ -55,4 +55,7 @@ public class Platform extends Entity implements IUpdate{
         }
     }
 
+    public void addEffectToPlayer(MySurfaceView view){
+        return;
+    }
 }

@@ -38,10 +38,10 @@ public class Player extends Entity implements IUpdate{
     public double vy;
 
     //水平移动方向常量
-    private final int DIRCTION_LEFT = 0;
-    private final int DIRCTION_RIGHT = 1;
+    public final int DIRCTION_LEFT = 0;
+    public final int DIRCTION_RIGHT = 1;
     //水平移动方向，初始向右
-    private int direction = DIRCTION_RIGHT;
+    public int direction = DIRCTION_RIGHT;
 
     //是否移动的标志
     public boolean isMoving;
@@ -95,6 +95,11 @@ public class Player extends Entity implements IUpdate{
         }
         if(isJumping){
             jump(view);
+        }
+        if(!isJumping){
+            if(!isOutOfPlatform()){
+                platform.addEffectToPlayer(view);
+            }
         }
 //        checkIfOnPlatform();
     }
@@ -235,7 +240,12 @@ public class Player extends Entity implements IUpdate{
 
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction()==MotionEvent.ACTION_DOWN){
-            vy = 50 ;
+            if(platform.getClass() == SpringPlatform.class){
+                vy = 100 ;
+            }
+            else{
+                vy = 50 ;
+            }
         }
         if(event.getAction()==MotionEvent.ACTION_UP){
             isJumping = true;

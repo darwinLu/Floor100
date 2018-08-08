@@ -239,11 +239,20 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             platformList.remove();
             int typeNumber = rand.nextInt(10);
             Platform newPlatform;
-            if(typeNumber>5){
+            if(typeNumber>7){
                 newPlatform = new Platform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),220,bmpPlatform);
             }
+            else if(typeNumber>4 && typeNumber<7){
+                newPlatform = new RollingPlatform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),220,bmpPlatform);
+            }
+            else if(typeNumber>2 && typeNumber<=4){
+                newPlatform = new UDPlatform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),220,bmpPlatform);
+            }
+            else if(typeNumber>1 && typeNumber<=2){
+                newPlatform = new SpringPlatform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),220,bmpPlatform);
+            }
             else {
-                newPlatform = new LRPlatform(-110 + screenW / 10 * typeNumber, screenH - (platformList.size() + 1) * (Platform.SPACE + Platform.THICKNESS), 220, bmpPlatform);
+                newPlatform = new LRPlatform(-110 + screenW / 10 * typeNumber, screenH - (platformList.size() + 1) * (Platform.SPACE + Platform.THICKNESS), 500, bmpPlatform);
             }
             platformList.add(newPlatform);
             updateObjects.add(newPlatform);
