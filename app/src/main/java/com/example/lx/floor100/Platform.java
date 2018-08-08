@@ -18,11 +18,11 @@ public class Platform extends Entity implements IUpdate{
     //平台序号
 //    public int number;
     //平台图片
-    private Bitmap bmpPlatform;
+    protected Bitmap bmpPlatform;
     //平台间距
     static public int SPACE = 400;
     //平台厚度
-    static public int THICKNESS = 20;
+    static public int THICKNESS = 40;
     //平台是否有效的标志位
     public boolean isOnScreen;
 
@@ -42,7 +42,8 @@ public class Platform extends Entity implements IUpdate{
         Paint paint = new Paint();
         paint.setColor(Color.RED);
         if(isOnScreen) {
-            canvas.drawRect(x, y, x + length, y + THICKNESS, paint);
+            canvas.drawBitmap(bmpPlatform,x,y,paint);
+            //canvas.drawRect(x, y, x + length, y + THICKNESS, paint);
         }
     }
 
@@ -53,4 +54,5 @@ public class Platform extends Entity implements IUpdate{
             isOnScreen = false;
         }
     }
+
 }

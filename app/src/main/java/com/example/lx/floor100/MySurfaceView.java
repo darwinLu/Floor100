@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewDebug;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,7 +48,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     //主循环标志
     private boolean gameIsRunning;
 
-    private Player player;
+    private BackGround backGround;
+    public Player player;
     private Platform floor;
     private LinkedList<Platform> platformList = new LinkedList<>();
     private int platformNumber;
@@ -144,17 +146,18 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         //初始化画笔
         paint = new Paint();
         //加载图片资源
-        bg = BitmapFactory.decodeResource(this.getResources(),R.mipmap.bg);
-        bmpPlayer = BitmapFactory.decodeResource(this.getResources(), R.mipmap.sola);
-        bmpPlatform = BitmapFactory.decodeResource(this.getResources(), R.mipmap.platform);
+        bg = BitmapFactory.decodeResource(this.getResources(),R.drawable.bg_gray);
+        bmpPlayer = BitmapFactory.decodeResource(this.getResources(), R.drawable.sola);
+        bmpPlatform = BitmapFactory.decodeResource(this.getResources(), R.drawable.platform);
         //初始化游戏对象
+        //背景
+        backGround = new BackGround(bg);
         //地面
         floor = new Platform(0,screenH-Platform.THICKNESS,screenW,bmpPlatform);
         platformList.add(0,floor);
         //平台
         platformNumber = screenH/(Platform.SPACE+Platform.THICKNESS)+2;
         for(int i=1;i<=platformNumber;i++){
-            Random rand = new Random(10);
             platformList.add(i,new Platform(-110+ screenW/10*rand.nextInt(10),screenH - (i)*(Platform.SPACE+Platform.THICKNESS),220,bmpPlatform));
         }
         for(int i=0;i<platformList.size();i++){
@@ -174,7 +177,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             canvas = sfh.lockCanvas();
             if (canvas != null) {
                 canvas.drawColor(Color.BLACK);
-                canvas.drawBitmap(bg,bg_x,bg_y,paint);
+                backGround.draw(canvas,paint);
+//                canvas.drawBitmap(bg,bg_x,bg_y,paint);
 //                platform.platformDraw(canvas,paint);
                 for(Iterator<Platform> platformIterator = platformList.iterator();platformIterator.hasNext();){
                     platformIterator.next().platformDraw(canvas);
@@ -194,7 +198,9 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 //        player.update();
         //步进所有物理模拟并进行碰撞检测
         if(isRollingBackground){
-            bg_y += rollingDistance;
+//            bg_y += rollingDistance;
+            backGround.speed = rollingDistance;
+            backGround.update();
             for(int i=0;i<platformList.size();i++){
                 platformList.get(i).y += rollingDistance;
             }
@@ -231,7 +237,16 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private void checkEveryPlatformIsDead() {
         if(platformList.getFirst().y>screenH){
             platformList.remove();
-            platformList.add(new Platform(-110+ screenW/10*rand.nextInt(10),screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),220,bmpPlatform));
+            int typeNumber = rand.nextInt(10);
+            Platform newPlatform;
+            if(typeNumber>5){
+                newPlatform = new Platform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),220,bmpPlatform);
+            }
+            else {
+                newPlatform = new LRPlatform(-110 + screenW / 10 * typeNumber, screenH - (platformList.size() + 1) * (Platform.SPACE + Platform.THICKNESS), 220, bmpPlatform);
+            }
+            platformList.add(newPlatform);
+            updateObjects.add(newPlatform);
         }
 //        int oldSize = platformList.size();
 //        Log.d("PLATFORM","本次检测总计有平台"+oldSize+"个");
@@ -263,6 +278,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
             for(int i=0;i<platformList.size();i++){
                 if(player.isCollisionWithPlatform((Platform)platformList.get(i))){
+                    player.y = ((Platform) platformList.get(i)).y - player.playerHeight;
+                    //System.out.println("player y:"+player.y+","+((Platform) platformList.get(i)).y+","+player.frameH);
                     player.isJumping = false;
                     player.isOnPlatform = true;
                     player.platform = (Platform)platformList.get(i);
