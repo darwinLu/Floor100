@@ -55,6 +55,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private LinkedList<Platform> platformList = new LinkedList<>();
     private int platformNumber;
     public Progress progress;
+    public Rank rank;
 
     //图片
     private Bitmap bmpPlayer;
@@ -88,10 +89,11 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                 View dialogView = factory.inflate(R.layout.game_over_layout,null);
                 dialogView.setFocusableInTouchMode(true);
                 dialogView.requestFocus();
-                TextView scoreText = (TextView) dialogView.findViewById(R.id.score);
-                scoreText.setText(score);
+                TextView scoreText = (TextView) dialogView.findViewById(R.id.game_score);
+                scoreText.setText(""+score);
                 final AlertDialog dialog = new AlertDialog.Builder(context)
                         .setView(dialogView).create();
+
                 dialog.show();
                 dialogView.findViewById(R.id.restart_game).setOnClickListener(new OnClickListener() {
                     @Override
@@ -107,6 +109,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                         ((MainActivity)context).finish();
                     }
                 });
+                gameIsRunning = false;
             }
         };
     }
@@ -155,7 +158,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         //背景
         backGround = new BackGround(bg);
         //地面
-        floor = new Platform(0,screenH-Platform.THICKNESS,screenW,bmpPlatform);
+        floor = new FloorPlatform(0,screenH-Platform.THICKNESS,screenW,bmpPlatform);
         platformList.add(0,floor);
         //平台
         platformNumber = screenH/(Platform.SPACE+Platform.THICKNESS)+2;
@@ -172,6 +175,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         player.platform = floor;
         //设置力量条
         progress = new Progress(10,0,500,30,10);
+        //设置积分牌
+        rank = new Rank(0);
         //设置游戏开始标志位，开启主循环
         gameIsRunning = true;
     }
@@ -189,6 +194,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                 }
                 player.playerDraw(canvas,paint);
                 progress.draw(canvas,paint);
+                rank.draw(canvas,paint);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -233,16 +239,17 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         if(player.y>screenH+player.frameH){
             Message message = new Message();
             Bundle bundle = new Bundle();
-            bundle.putInt("score",99);
+            bundle.putInt("score",rank.getCurrentRank());
             message.setData(bundle);
             mHandler.sendMessage(message);
-            gameIsRunning = false;
+            //gameIsRunning = false;
         }
     }
 
     private void checkEveryPlatformIsDead() {
         if(platformList.getFirst().y>screenH){
             platformList.remove();
+            rank.addRank();
             int typeNumber = rand.nextInt(10);
             Platform newPlatform;
             if(typeNumber>7){
