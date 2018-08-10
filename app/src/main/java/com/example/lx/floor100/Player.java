@@ -238,18 +238,30 @@ public class Player extends Entity implements IUpdate{
 //        }
     }
 
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(MotionEvent event,MySurfaceView view) {
         if(event.getAction()==MotionEvent.ACTION_DOWN){
-            if(platform.getClass() == SpringPlatform.class){
-                vy = 100 ;
-            }
-            else{
-                vy = 50 ;
-            }
+//            if(platform.getClass() == SpringPlatform.class){
+//                //vy = 100;
+//                vy = view.progress.getEndValue()*10 + 50 ;
+//            }
+//            else{
+//                //vy = 50 ;
+//                vy = view.progress.getEndValue()*10;
+//            }
         }
         if(event.getAction()==MotionEvent.ACTION_UP){
-            isJumping = true;
-            isOnPlatform = false;
+            if(isJumping == false){
+                if(platform.getClass() == SpringPlatform.class){
+                    //vy = 100;
+                    vy = view.progress.getEndValue()*10 + 50 ;
+                }
+                else{
+                    //vy = 50 ;
+                    vy = view.progress.getEndValue()*10;
+                }
+                isJumping = true;
+                isOnPlatform = false;
+            }
         }
         return true;
     }

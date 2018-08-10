@@ -17,6 +17,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewDebug;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,6 +54,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private Platform floor;
     private LinkedList<Platform> platformList = new LinkedList<>();
     private int platformNumber;
+    public Progress progress;
 
     //图片
     private Bitmap bmpPlayer;
@@ -168,6 +170,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         updateObjects.add(player);
         //设置主角初始所在的平台
         player.platform = floor;
+        //设置力量条
+        progress = new Progress(10,0,500,30,10);
         //设置游戏开始标志位，开启主循环
         gameIsRunning = true;
     }
@@ -184,6 +188,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                     platformIterator.next().platformDraw(canvas);
                 }
                 player.playerDraw(canvas,paint);
+                progress.draw(canvas,paint);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -208,6 +213,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         for (int i=0;i<updateObjects.size();i++){
             updateObjects.get(i).update(this);
         }
+        progress.udpate();
         checkEveryPlatformIsDead();
         checkCollision(player,platformList);
         checkGameOver();
@@ -311,7 +317,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        player.onTouchEvent(event);
+        progress.onTouchEvent(event,this);
+        player.onTouchEvent(event,this);
         return true;
     }
 

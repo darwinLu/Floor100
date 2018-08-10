@@ -20,7 +20,7 @@ public class Platform extends Entity implements IUpdate{
     //平台图片
     protected Bitmap bmpPlatform;
     //平台间距
-    static public int SPACE = 400;
+    static public int SPACE = 100;
     //平台厚度
     static public int THICKNESS = 40;
     //平台是否有效的标志位
