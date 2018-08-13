@@ -109,7 +109,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                         ((MainActivity)context).finish();
                     }
                 });
-                gameIsRunning = false;
+                //gameIsRunning = false;
             }
         };
     }
@@ -155,6 +155,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         bmpPlayer = BitmapFactory.decodeResource(this.getResources(), R.drawable.sola);
         bmpPlatform = BitmapFactory.decodeResource(this.getResources(), R.drawable.platform);
         //初始化游戏对象
+        //清除平台列表
+        platformList.clear();
         //背景
         backGround = new BackGround(bg);
         //地面
@@ -236,13 +238,14 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void checkGameOver() {
-        if(player.y>screenH+player.frameH){
+        if(player.y>screenH+player.playerHeight){
             Message message = new Message();
             Bundle bundle = new Bundle();
             bundle.putInt("score",rank.getCurrentRank());
             message.setData(bundle);
             mHandler.sendMessage(message);
-            //gameIsRunning = false;
+            //Log.d("DIALOG","show dialog");
+            gameIsRunning = false;
         }
     }
 
