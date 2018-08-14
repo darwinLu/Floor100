@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.lx.floor100.activity.StartActivity">
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context="com.example.lx.floor100.StartActivity">
 
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="是男人就上100层"
+        tools:layout_editor_absoluteY="153dp"
+        tools:layout_editor_absoluteX="163dp" />
 
     <Button
         android:id="@+id/start_button"
@@ -15,11 +24,27 @@
         tools:layout_editor_absoluteX="148dp"
         tools:layout_editor_absoluteY="231dp" />
 
-    <TextView
-        android:id="@+id/title"
+    <Button
+        android:id="@+id/ranking_list_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="是男人就上100层"
-        tools:layout_editor_absoluteY="153dp"
-        tools:layout_editor_absoluteX="163dp" />
-</android.support.constraint.ConstraintLayout>
+        android:text="排行榜"
+        tools:layout_editor_absoluteX="148dp"
+        tools:layout_editor_absoluteY="231dp" />
+
+    <Button
+        android:id="@+id/option_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="设置"
+        tools:layout_editor_absoluteX="148dp"
+        tools:layout_editor_absoluteY="231dp" />
+
+    <Button
+        android:id="@+id/exit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="退出"
+        tools:layout_editor_absoluteX="148dp"
+        tools:layout_editor_absoluteY="231dp" />
+</LinearLayout>
