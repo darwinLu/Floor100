@@ -1,15 +1,19 @@
-package com.example.lx.floor100;
+package com.example.lx.floor100.entity;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import com.example.lx.floor100.engine.Entity;
+import com.example.lx.floor100.engine.IUpdate;
+import com.example.lx.floor100.view.MySurfaceView;
+
 /**
  * Created by lx on 2017-06-19.
  */
 
-public class Platform extends Entity implements IUpdate{
+public class Platform extends Entity implements IUpdate {
 
     //平台位置
     public int x;

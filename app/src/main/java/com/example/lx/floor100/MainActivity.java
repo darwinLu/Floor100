@@ -2,8 +2,8 @@ package com.example.lx.floor100;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.Button;
+
+import com.example.lx.floor100.view.MySurfaceView;
 
 public class MainActivity extends AppCompatActivity {
 

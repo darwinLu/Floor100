@@ -1,24 +1,26 @@
-package com.example.lx.floor100;
+package com.example.lx.floor100.entity;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import com.example.lx.floor100.view.MySurfaceView;
+
 /**
- * Created by lx on 2018-08-10.
+ * Created by lx on 2018-08-08.
  */
 
-public class FloorPlatform extends Platform {
+public class SpringPlatform extends Platform {
 
-    public FloorPlatform(int platform_x, int platform_y, int length, Bitmap bmpPlatform) {
+    public SpringPlatform(int platform_x, int platform_y, int length, Bitmap bmpPlatform) {
         super(platform_x, platform_y, length, bmpPlatform);
     }
 
     @Override
     public void platformDraw(Canvas canvas) {
         Paint paint = new Paint();
-        paint.setColor(Color.GREEN);
+        paint.setColor(Color.BLUE);
         if(isOnScreen) {
             //canvas.drawBitmap(bmpPlatform,x,y,paint);
             canvas.drawRect(x, y, x + length, y + THICKNESS, paint);

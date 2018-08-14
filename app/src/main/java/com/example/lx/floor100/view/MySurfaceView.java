@@ -1,4 +1,4 @@
-package com.example.lx.floor100;
+package com.example.lx.floor100.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,21 +6,37 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewDebug;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.lx.floor100.MainActivity;
+import com.example.lx.floor100.engine.IUpdate;
+import com.example.lx.floor100.hud.Progress;
+import com.example.lx.floor100.R;
+import com.example.lx.floor100.hud.Rank;
+import com.example.lx.floor100.entity.BackGround;
+import com.example.lx.floor100.entity.FloorPlatform;
+import com.example.lx.floor100.entity.LRPlatform;
+import com.example.lx.floor100.entity.Platform;
+import com.example.lx.floor100.entity.Player;
+import com.example.lx.floor100.entity.RollingPlatform;
+import com.example.lx.floor100.entity.SpringPlatform;
+import com.example.lx.floor100.entity.UDPlatform;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -73,7 +89,21 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     Random rand = new Random();
 
     private Handler mHandler;
-
+    //音乐
+    private final int MEDIAPLAYER_PAUSE = 0;
+    private final int MEDIAPLAYER_PLAY = 1;
+    private final int MEDIAPLAYER_STOP = 2;
+    private int mediaState = 0;
+    private MediaPlayer mediaPlayer;
+    private int currentTime;
+    private int musicMaxTime;
+    private int currentVol;
+    private int setTime = 5000;
+    private AudioManager am;
+    //音效
+    public SoundPool soundPool;
+    public int jumpSound;
+    public int powerSound;
 
 
     public MySurfaceView(final Context context) {
@@ -93,7 +123,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                 scoreText.setText(""+score);
                 final AlertDialog dialog = new AlertDialog.Builder(context)
                         .setView(dialogView).create();
-
+                dialog.setCancelable(false);
                 dialog.show();
                 dialogView.findViewById(R.id.restart_game).setOnClickListener(new OnClickListener() {
                     @Override
@@ -119,8 +149,28 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         gameLoopThread.start();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+        mediaPlayer = MediaPlayer.create(this.getContext(),R.raw.bgm1);
+        mediaPlayer.setLooping(true);
+//        mediaPlayer.start();
+        soundPool = new SoundPool.Builder()
+                .setMaxStreams(100)
+                .build();
+        jumpSound = soundPool.load(this.getContext(),R.raw.jump,0);
+        powerSound = soundPool.load(this.getContext(),R.raw.power,0);
+
+//        musicMaxTime = mediaPlayer.getDuration();
+        //am = (AudioManager)this.getContext().getSystemService(Context.AUDIO_SERVICE);
+        //((MainActivity)this.getContext()).setVolumeControlStream(AudioManager.STREAM_MUSIC);
+//        try {
+//            mediaPlayer.prepare();
+//            mediaPlayer.start();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
         gameLoopThread = new Thread(this);
         gameLoopThread.start();
 
@@ -322,6 +372,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
+        mediaPlayer.stop();
         gameIsRunning = false;
     }
 

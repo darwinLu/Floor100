@@ -1,7 +1,6 @@
-package com.example.lx.floor100;
+package com.example.lx.floor100.engine;
 
-import android.content.Context;
-import android.view.View;
+import com.example.lx.floor100.view.MySurfaceView;
 
 /**
  * Created by lx on 2018-07-02.

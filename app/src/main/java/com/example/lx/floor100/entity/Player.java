@@ -1,18 +1,20 @@
-package com.example.lx.floor100;
+package com.example.lx.floor100.entity;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
+
+import com.example.lx.floor100.R;
+import com.example.lx.floor100.engine.Entity;
+import com.example.lx.floor100.engine.IUpdate;
+import com.example.lx.floor100.view.MySurfaceView;
 
 /**
  * Created by lx on 2017-05-31.
  */
 
-public class Player extends Entity implements IUpdate{
+public class Player extends Entity implements IUpdate {
 
     //主角实时位置，代表主角左上角位置
     public int x;
@@ -251,6 +253,7 @@ public class Player extends Entity implements IUpdate{
         }
         if(event.getAction()==MotionEvent.ACTION_UP){
             if(isJumping == false){
+                view.soundPool.play(view.jumpSound,1,1,0,0,1);
                 if(platform.getClass() == SpringPlatform.class){
                     //vy = 100;
                     vy = view.progress.getEndValue()*10 + 50 ;

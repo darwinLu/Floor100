@@ -1,8 +1,4 @@
-package com.example.lx.floor100;
-
-import android.util.Log;
-
-import com.example.lx.floor100.Entity;
+package com.example.lx.floor100.engine;
 
 import java.util.Iterator;
 import java.util.List;

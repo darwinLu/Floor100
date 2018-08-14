@@ -1,9 +1,11 @@
-package com.example.lx.floor100;
+package com.example.lx.floor100.entity;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+
+import com.example.lx.floor100.view.MySurfaceView;
 
 /**
  * Created by lx on 2018-08-08.

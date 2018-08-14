@@ -1,9 +1,12 @@
-package com.example.lx.floor100;
+package com.example.lx.floor100.hud;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
+
+import com.example.lx.floor100.R;
+import com.example.lx.floor100.view.MySurfaceView;
 
 /**
  * Created by lx on 2018-08-09.
@@ -24,6 +27,8 @@ public class Progress {
     private int currentFrame = 0;
 
     private int endValue;
+
+    private int powerSoundStream;
 
     public Progress(int max, int current, int length, int height,int column) {
         this.max = max;
@@ -69,9 +74,11 @@ public class Progress {
 
     public boolean onTouchEvent(MotionEvent event,MySurfaceView view) {
         if(event.getAction()==MotionEvent.ACTION_DOWN){
+            powerSoundStream = view.soundPool.play(view.powerSound,1,1,0,-1,1);
             isIncreasing = true;
         }
         if(event.getAction()==MotionEvent.ACTION_UP){
+            view.soundPool.stop(powerSoundStream);
             isIncreasing = false;
             endValue = current;
         }
