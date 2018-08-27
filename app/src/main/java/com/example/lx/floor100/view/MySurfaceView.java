@@ -36,7 +36,6 @@ import com.example.lx.floor100.entity.RollingPlatform;
 import com.example.lx.floor100.entity.SpringPlatform;
 import com.example.lx.floor100.entity.UDPlatform;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -77,6 +76,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private Bitmap bmpPlayer;
     private Bitmap bmpPlatform;
     private Bitmap bg;
+    private Bitmap bmpRollingPlatform;
+    private Bitmap bmpFloorPlatform;
 
     private List<IUpdate> updateObjects = new ArrayList<>();
 
@@ -201,21 +202,23 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         //初始化画笔
         paint = new Paint();
         //加载图片资源
-        bg = BitmapFactory.decodeResource(this.getResources(),R.drawable.bg_gray);
+        bg = BitmapFactory.decodeResource(this.getResources(),R.drawable.sky_cloud);
         bmpPlayer = BitmapFactory.decodeResource(this.getResources(), R.drawable.sola);
         bmpPlatform = BitmapFactory.decodeResource(this.getResources(), R.drawable.platform);
+        bmpRollingPlatform = BitmapFactory.decodeResource(this.getResources(), R.drawable.rolling_platfrom);
+        bmpFloorPlatform = BitmapFactory.decodeResource(this.getResources(), R.drawable.floor_platform);
         //初始化游戏对象
         //清除平台列表
         platformList.clear();
         //背景
         backGround = new BackGround(bg);
         //地面
-        floor = new FloorPlatform(0,screenH-Platform.THICKNESS,screenW,bmpPlatform);
+        floor = new FloorPlatform(0,screenH-Platform.THICKNESS,screenW,bmpFloorPlatform);
         platformList.add(0,floor);
         //平台
         platformNumber = screenH/(Platform.SPACE+Platform.THICKNESS)+2;
         for(int i=1;i<=platformNumber;i++){
-            platformList.add(i,new Platform(-110+ screenW/10*rand.nextInt(10),screenH - (i)*(Platform.SPACE+Platform.THICKNESS),220,bmpPlatform));
+            platformList.add(i,new Platform(-110+ screenW/10*rand.nextInt(10),screenH - (i)*(Platform.SPACE+Platform.THICKNESS),400,bmpPlatform));
         }
         for(int i=0;i<platformList.size();i++){
             updateObjects.add(platformList.get(i));
@@ -306,19 +309,19 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             int typeNumber = rand.nextInt(10);
             Platform newPlatform;
             if(typeNumber>7){
-                newPlatform = new Platform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),220,bmpPlatform);
+                newPlatform = new Platform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),400,bmpPlatform);
             }
             else if(typeNumber>4 && typeNumber<7){
-                newPlatform = new RollingPlatform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),220,bmpPlatform);
+                newPlatform = new RollingPlatform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),400,bmpRollingPlatform);
             }
             else if(typeNumber>2 && typeNumber<=4){
-                newPlatform = new UDPlatform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),220,bmpPlatform);
+                newPlatform = new UDPlatform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),400,bmpPlatform);
             }
             else if(typeNumber>1 && typeNumber<=2){
                 newPlatform = new SpringPlatform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),220,bmpPlatform);
             }
             else {
-                newPlatform = new LRPlatform(-110 + screenW / 10 * typeNumber, screenH - (platformList.size() + 1) * (Platform.SPACE + Platform.THICKNESS), 500, bmpPlatform);
+                newPlatform = new LRPlatform(-110 + screenW / 10 * typeNumber, screenH - (platformList.size() + 1) * (Platform.SPACE + Platform.THICKNESS), 400, bmpPlatform);
             }
             platformList.add(newPlatform);
             updateObjects.add(newPlatform);

@@ -29,8 +29,8 @@ public class LRPlatform extends Platform {
         Paint paint = new Paint();
         paint.setColor(Color.GREEN);
         if(isOnScreen) {
-            //canvas.drawBitmap(bmpPlatform,x,y,paint);
-            canvas.drawRect(x, y, x + length, y + THICKNESS, paint);
+            canvas.drawBitmap(bmpPlatform,x,y,paint);
+            //canvas.drawRect(x, y, x + length, y + THICKNESS, paint);
         }
     }
 

@@ -84,7 +84,7 @@ public class Player extends Entity implements IUpdate {
         playerWidth = bmpPlayer.getWidth()/4 - 20;
         playerHeight = bmpPlayer.getHeight()/4 - 40;
         this.x = 0;
-        this.y = MySurfaceView.screenH - frameH;
+        this.y = MySurfaceView.screenH - playerHeight - 80;
         isMoving = true;
     }
 
