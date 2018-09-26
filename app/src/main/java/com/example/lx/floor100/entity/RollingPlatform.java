@@ -31,7 +31,7 @@ public class RollingPlatform extends Platform {
     public RollingPlatform(int platform_x, int platform_y, int length, Bitmap bmpPlatform) {
         super(platform_x, platform_y, length, bmpPlatform);
         Random rand = new Random();
-        direction = rand.nextInt(1);
+        direction = rand.nextInt(2);
         frameW = bmpPlatform.getWidth()/8;
         frameH = bmpPlatform.getHeight();
     }
@@ -63,6 +63,9 @@ public class RollingPlatform extends Platform {
         if(isOnScreen) {
             canvas.save();
             canvas.clipRect(x,y,x+length,y+THICKNESS);
+            if(direction == DIRCTION_LEFT){
+                frame_x = (7 - currentFrame % 8) * frameW;
+            }
             canvas.drawBitmap(bmpPlatform,x-frame_x,y-frame_y,paint);
             //canvas.drawRect(x, y, x + length, y + THICKNESS, paint);
             canvas.restore();

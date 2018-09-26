@@ -74,10 +74,14 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
     //图片
     private Bitmap bmpPlayer;
+    private Bitmap bmpPlayerJump;
     private Bitmap bmpPlatform;
     private Bitmap bg;
     private Bitmap bmpRollingPlatform;
     private Bitmap bmpFloorPlatform;
+    private Bitmap bmpSpringPlatform;
+    private Bitmap bmpSpringPlatformCompress;
+    private Bitmap bmpSpringPlatformUncompress;
 
     private List<IUpdate> updateObjects = new ArrayList<>();
 
@@ -203,10 +207,14 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         paint = new Paint();
         //加载图片资源
         bg = BitmapFactory.decodeResource(this.getResources(),R.drawable.sky_cloud);
-        bmpPlayer = BitmapFactory.decodeResource(this.getResources(), R.drawable.sola);
+        bmpPlayer = BitmapFactory.decodeResource(this.getResources(), R.drawable.robot_run_small);
+        bmpPlayerJump = BitmapFactory.decodeResource(this.getResources(), R.drawable.robot_jump_small);
         bmpPlatform = BitmapFactory.decodeResource(this.getResources(), R.drawable.platform);
         bmpRollingPlatform = BitmapFactory.decodeResource(this.getResources(), R.drawable.rolling_platfrom);
         bmpFloorPlatform = BitmapFactory.decodeResource(this.getResources(), R.drawable.floor_platform);
+        bmpSpringPlatform = BitmapFactory.decodeResource(this.getResources(), R.drawable.spring_platform);
+        bmpSpringPlatformCompress = BitmapFactory.decodeResource(this.getResources(), R.drawable.spring_platform_compress);
+        bmpSpringPlatformUncompress = BitmapFactory.decodeResource(this.getResources(), R.drawable.spring_platform_uncompress);
         //初始化游戏对象
         //清除平台列表
         platformList.clear();
@@ -224,7 +232,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             updateObjects.add(platformList.get(i));
         }
         //主角
-        player = new Player(bmpPlayer);
+        player = new Player(bmpPlayer,bmpPlayerJump);
         updateObjects.add(player);
         //设置主角初始所在的平台
         player.platform = floor;
@@ -311,14 +319,14 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             if(typeNumber>7){
                 newPlatform = new Platform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),400,bmpPlatform);
             }
-            else if(typeNumber>4 && typeNumber<7){
+            else if(typeNumber>3 && typeNumber<=7){
                 newPlatform = new RollingPlatform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),400,bmpRollingPlatform);
             }
-            else if(typeNumber>2 && typeNumber<=4){
+            else if(typeNumber>2 && typeNumber<=3){
                 newPlatform = new UDPlatform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),400,bmpPlatform);
             }
             else if(typeNumber>1 && typeNumber<=2){
-                newPlatform = new SpringPlatform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),220,bmpPlatform);
+                newPlatform = new SpringPlatform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),400,bmpSpringPlatform,bmpSpringPlatformCompress,bmpSpringPlatformUncompress);
             }
             else {
                 newPlatform = new LRPlatform(-110 + screenW / 10 * typeNumber, screenH - (platformList.size() + 1) * (Platform.SPACE + Platform.THICKNESS), 400, bmpPlatform);
@@ -361,6 +369,10 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                     player.isJumping = false;
                     player.isOnPlatform = true;
                     player.platform = (Platform)platformList.get(i);
+                    //如果是弹簧踏板，特殊处理
+                    if(platformList.get(i).getClass()==SpringPlatform.class){
+                        ((SpringPlatform)platformList.get(i)).playerFirstTouchSpring= true;
+                    }
                 }
             }
         }

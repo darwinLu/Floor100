@@ -2,6 +2,7 @@ package com.example.lx.floor100.entity;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
@@ -61,6 +62,7 @@ public class Player extends Entity implements IUpdate {
 
     //主角图片（由构造函数传入）
     private Bitmap bmpPlayer;
+    private Bitmap bmpPlayerJump;
 
     //主角行走图帧号
     private int currentFrame = 0;
@@ -75,14 +77,15 @@ public class Player extends Entity implements IUpdate {
 
 
     //构造函数
-    public Player(Bitmap bmpPlayer){
+    public Player(Bitmap bmpPlayer,Bitmap bmpPlayerJump){
         this.bmpPlayer = bmpPlayer;
+        this.bmpPlayerJump = bmpPlayerJump;
 //        frameW = bmpPlayer.getWidth()/4 - 20;
 //        frameH = bmpPlayer.getHeight()/4 - 30;
-        frameW = bmpPlayer.getWidth()/4;
-        frameH = bmpPlayer.getHeight()/4;
-        playerWidth = bmpPlayer.getWidth()/4 - 20;
-        playerHeight = bmpPlayer.getHeight()/4 - 40;
+        frameW = bmpPlayer.getWidth()/8;
+        frameH = bmpPlayer.getHeight();
+        playerWidth = bmpPlayer.getWidth()/8 - 10;
+        playerHeight = bmpPlayer.getHeight() - 20;
         this.x = 0;
         this.y = MySurfaceView.screenH - playerHeight - 80;
         isMoving = true;
@@ -107,21 +110,24 @@ public class Player extends Entity implements IUpdate {
     }
 
     private void changeFrame() {
-        changeFrameCount++;
-        //每隔6+2帧修改一次动画
-        if(changeFrameCount > 6){
-            if(direction == DIRCTION_RIGHT){
-                indexLine = 2;
+        if(!isJumping){
+            changeFrameCount++;
+            //每隔6+2帧修改一次动画
+            if(changeFrameCount > 6){
+                if(direction == DIRCTION_RIGHT){
+                    indexLine = 0;
+                }
+                else {
+                    indexLine = 0;
+                }
+                currentFrame++;
+                if(currentFrame == 8){
+                    currentFrame = 0;
+                }
+                changeFrameCount = 0;
             }
-            else {
-                indexLine = 1;
-            }
-            currentFrame++;
-            if(currentFrame == 4){
-                currentFrame = 0;
-            }
-            changeFrameCount = 0;
         }
+
     }
 
     public void move(MySurfaceView view){
@@ -180,21 +186,35 @@ public class Player extends Entity implements IUpdate {
     }
 
     public void playerDraw(Canvas canvas, Paint paint){
-        int frame_x = currentFrame % 4 * frameW;
-        int frame_y = frameH * indexLine;
+        if(!isJumping){
+            int frame_x = currentFrame % 8 * frameW;
+            int frame_y = frameH * indexLine;
 //        int frame_x = currentFrame % 4 * (bmpPlayer.getWidth()/4) + 10;
 //        int frame_y = currentFrame / 4 * (bmpPlayer.getHeight()/4) + 15;
-        canvas.save();
-        canvas.clipRect(x,y,x+playerWidth,y+playerHeight);
-        //canvas.clipRect(x,y,x+frameW,y+frameH);
-//        if(direction == DIRCTION_RIGHT){
-//            canvas.scale(-1,1,x-frame_x+bmpPlayer.getWidth()/2,y-frame_y+bmpPlayer.getHeight()/2);
-//            //canvas.scale(-1,1,x-frame_x+frameW,y-frame_y+frameH);
-//        }
-        canvas.drawBitmap(bmpPlayer,x-frame_x-10,y-frame_y-20,paint);
-        //paint.setColor(Color.RED);
-        //canvas.drawRect(x,y,x+playerWidth,y+playerHeight,paint);
-        canvas.restore();
+            canvas.save();
+            canvas.clipRect(x,y,x+playerWidth,y+playerHeight);
+            //canvas.clipRect(x,y,x+frameW,y+frameH);
+            if(direction == DIRCTION_LEFT){
+                canvas.scale(-1,1,x-frame_x+bmpPlayer.getWidth()/2,y-frame_y+bmpPlayer.getHeight()/2);
+                //canvas.scale(-1,1,x-frame_x+frameW,y-frame_y+frameH);
+            }
+            canvas.drawBitmap(bmpPlayer,x-frame_x-5,y-frame_y-10,paint);
+            //paint.setColor(Color.RED);
+            //canvas.drawRect(x,y,x+playerWidth,y+playerHeight,paint);
+            canvas.restore();
+        }
+        else if (isJumping){
+            canvas.save();
+            canvas.clipRect(x,y,x+playerWidth,y+playerHeight);
+            //paint.setColor(Color.RED);
+            if(direction == DIRCTION_LEFT){
+                canvas.scale(-1,1,x+bmpPlayerJump.getWidth()/2,y+bmpPlayerJump.getHeight()/2);
+                //canvas.scale(-1,1,x-frame_x+frameW,y-frame_y+frameH);
+            }
+            canvas.drawBitmap(bmpPlayerJump,x-5,y-10,paint);
+            //canvas.drawRect(x,y,x+playerWidth,y+playerHeight,paint);
+            canvas.restore();
+        }
     }
 
     public boolean isOutOfPlatform(){
@@ -257,6 +277,7 @@ public class Player extends Entity implements IUpdate {
                 if(platform.getClass() == SpringPlatform.class){
                     //vy = 100;
                     vy = view.progress.getEndValue()*10 + 50 ;
+                    ((SpringPlatform)platform).playSpringAnimation = true;
                 }
                 else{
                     //vy = 50 ;
