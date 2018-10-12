@@ -1,6 +1,8 @@
 package com.example.lx.floor100.view;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -12,6 +14,7 @@ import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
@@ -21,8 +24,10 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.lx.floor100.MainActivity;
+import com.example.lx.floor100.RankActivity;
 import com.example.lx.floor100.engine.IUpdate;
 import com.example.lx.floor100.hud.Progress;
 import com.example.lx.floor100.R;
@@ -36,6 +41,16 @@ import com.example.lx.floor100.entity.RollingPlatform;
 import com.example.lx.floor100.entity.SpringPlatform;
 import com.example.lx.floor100.entity.UDPlatform;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -119,7 +134,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         mHandler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
-                int score = msg.getData().getInt("score");
+                final int score = msg.getData().getInt("score");
                 LayoutInflater factory =LayoutInflater.from(context);
                 View dialogView = factory.inflate(R.layout.game_over_layout,null);
                 dialogView.setFocusableInTouchMode(true);
@@ -137,6 +152,15 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                         RestartGame();
                     }
                 });
+                dialogView.findViewById(R.id.submit_score).setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(context,"最高分"+score,Toast.LENGTH_LONG).show();
+                        submitScore("Myuserid",score);
+                        Intent intent = new Intent(context, RankActivity.class);
+                        context.startActivity(intent);
+                    }
+                });
                 dialogView.findViewById(R.id.end_game).setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -149,6 +173,35 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         };
     }
 
+    private void submitScore(final String userId, final int score) {
+        new Thread(new Runnable(){
+            @Override
+            public void run() {
+                HttpURLConnection connection = null;
+                try {
+                    String result = "";
+                    URL url = new URL("http://106.12.211.73:8080/floor100_web/insertScore.do");
+                    connection = (HttpURLConnection)url.openConnection();
+                    connection.setRequestMethod("POST");
+                    DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+                    out.writeBytes("userId="+userId+"&"+"score="+score);
+                    InputStream in = connection.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    result = reader.readLine();
+                    out.flush();
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                finally {
+                    if(connection != null) {
+                        connection.disconnect();
+                    }
+                }
+            }
+        }).start();
+    }
+
     private void RestartGame() {
         gameLoopThread = new Thread(this);
         gameLoopThread.start();
@@ -157,9 +210,11 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        mediaPlayer = MediaPlayer.create(this.getContext(),R.raw.bgm1);
-        mediaPlayer.setLooping(true);
-//        mediaPlayer.start();
+        if(getContext().getSharedPreferences("option",Context.MODE_PRIVATE).getString("music_switch","off").equals("on")){
+            mediaPlayer = MediaPlayer.create(this.getContext(),R.raw.bgm1);
+            mediaPlayer.setLooping(true);
+            mediaPlayer.start();
+        }
         soundPool = new SoundPool.Builder()
                 .setMaxStreams(100)
                 .build();

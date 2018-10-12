@@ -1,5 +1,6 @@
 package com.example.lx.floor100.entity;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -273,7 +274,10 @@ public class Player extends Entity implements IUpdate {
         }
         if(event.getAction()==MotionEvent.ACTION_UP){
             if(isJumping == false){
-                view.soundPool.play(view.jumpSound,1,1,0,0,1);
+                if(view.getContext().getSharedPreferences("option", Context.MODE_PRIVATE)
+                        .getString("sound_switch","off").equals("on")){
+                    view.soundPool.play(view.jumpSound,1,1,0,0,1);
+                }
                 if(platform.getClass() == SpringPlatform.class){
                     //vy = 100;
                     vy = view.progress.getEndValue()*10 + 50 ;

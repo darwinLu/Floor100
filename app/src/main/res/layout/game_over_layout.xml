@@ -31,6 +31,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <Button
+            android:id="@+id/submit_score"
+            android:text="提交"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Button
             android:id="@+id/end_game"
             android:text="主菜单"
             android:layout_width="wrap_content"

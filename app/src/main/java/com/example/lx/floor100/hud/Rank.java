@@ -14,7 +14,7 @@ public class Rank {
 
     private int currentRank;
 
-    private int level = 4;
+    private int level = 2;
 
     private int rankFrame = 0;
 

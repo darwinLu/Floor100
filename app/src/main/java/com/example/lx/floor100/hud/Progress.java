@@ -1,5 +1,6 @@
 package com.example.lx.floor100.hud;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -74,11 +75,17 @@ public class Progress {
 
     public boolean onTouchEvent(MotionEvent event,MySurfaceView view) {
         if(event.getAction()==MotionEvent.ACTION_DOWN){
-            powerSoundStream = view.soundPool.play(view.powerSound,1,1,0,-1,1);
+            if(view.getContext().getSharedPreferences("option", Context.MODE_PRIVATE)
+                    .getString("sound_switch","off").equals("on")){
+                powerSoundStream = view.soundPool.play(view.powerSound,1,1,0,-1,1);
+            }
             isIncreasing = true;
         }
         if(event.getAction()==MotionEvent.ACTION_UP){
-            view.soundPool.stop(powerSoundStream);
+            if(view.getContext().getSharedPreferences("option", Context.MODE_PRIVATE)
+                    .getString("sound_switch","off").equals("on")){
+                view.soundPool.stop(powerSoundStream);
+            }
             isIncreasing = false;
             endValue = current;
         }
