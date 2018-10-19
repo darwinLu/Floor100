@@ -6,45 +6,46 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
+    android:background="@drawable/sky_cloud"
     tools:context="com.example.lx.floor100.StartActivity">
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="是男人就上100层"
-        tools:layout_editor_absoluteY="153dp"
-        tools:layout_editor_absoluteX="163dp" />
-
+        android:text="是男人就上一百层"
+        android:textColor="@android:color/holo_orange_dark"
+        android:textSize="40dp" />
+    <TextView
+        android:id="@+id/blank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="40dp" />
     <Button
         android:id="@+id/start_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="开始"
-        tools:layout_editor_absoluteX="148dp"
-        tools:layout_editor_absoluteY="231dp" />
+        android:backgroundTint="@android:color/holo_orange_dark"
+        android:text="开始" />
 
     <Button
         android:id="@+id/ranking_list_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="排行榜"
-        tools:layout_editor_absoluteX="148dp"
-        tools:layout_editor_absoluteY="231dp" />
+        android:backgroundTint="@android:color/holo_orange_dark"
+        android:text="排行榜" />
 
     <Button
         android:id="@+id/option_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="设置"
-        tools:layout_editor_absoluteX="148dp"
-        tools:layout_editor_absoluteY="231dp" />
+        android:backgroundTint="@android:color/holo_orange_dark"
+        android:text="设置" />
 
     <Button
         android:id="@+id/exit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="退出"
-        tools:layout_editor_absoluteX="148dp"
-        tools:layout_editor_absoluteY="231dp" />
+        android:backgroundTint="@android:color/holo_orange_dark"
+        android:text="退出" />
 </LinearLayout>
