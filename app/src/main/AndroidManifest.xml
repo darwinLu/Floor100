@@ -12,7 +12,8 @@
         <activity android:name=".MainActivity"
             android:theme="@style/FullScreen"/>
         <activity android:name=".StartActivity"
-                  android:theme="@style/FullScreen">
+                  android:theme="@style/FullScreen"
+                  android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

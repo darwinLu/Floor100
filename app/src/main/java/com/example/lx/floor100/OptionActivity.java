@@ -1,5 +1,6 @@
 package com.example.lx.floor100;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -38,6 +39,8 @@ public class OptionActivity extends AppCompatActivity {
                     editor.putString("music_switch","off");
                 }
                 editor.apply();
+                finish();
+
             }
         });
         loadOption();

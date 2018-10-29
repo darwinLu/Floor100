@@ -8,44 +8,47 @@
     android:gravity="center"
     android:background="@drawable/sky_cloud"
     tools:context="com.example.lx.floor100.StartActivity">
-
-    <TextView
+    <ImageView
+        android:id="@+id/title_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"/>
+    <!--<TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="是男人就上一百层"
         android:textColor="@android:color/holo_orange_dark"
-        android:textSize="40dp" />
-    <TextView
-        android:id="@+id/blank"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="40dp" />
+        android:textSize="40dp" />-->
     <Button
         android:id="@+id/start_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@android:color/holo_orange_dark"
+        android:background="@drawable/button_image"
+        android:layout_marginBottom="10dp"
         android:text="开始" />
 
     <Button
         android:id="@+id/ranking_list_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@android:color/holo_orange_dark"
+        android:background="@drawable/button_image"
+        android:layout_marginBottom="10dp"
         android:text="排行榜" />
 
     <Button
         android:id="@+id/option_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@android:color/holo_orange_dark"
+        android:background="@drawable/button_image"
+        android:layout_marginBottom="10dp"
         android:text="设置" />
 
     <Button
         android:id="@+id/exit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@android:color/holo_orange_dark"
+        android:background="@drawable/button_image"
+        android:layout_marginBottom="10dp"
         android:text="退出" />
 </LinearLayout>

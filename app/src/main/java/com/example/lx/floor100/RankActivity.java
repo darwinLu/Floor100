@@ -1,5 +1,6 @@
 package com.example.lx.floor100;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -7,9 +8,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.lx.floor100.entity.RankItem;
+import com.example.lx.floor100.hud.Rank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +21,7 @@ public class RankActivity extends AppCompatActivity {
 
     private RecyclerView rankRecyclerView;
     private List<RankItem> mRankList = new ArrayList<>();
+    private Button exitRankButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +32,14 @@ public class RankActivity extends AppCompatActivity {
         rankRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         RankAdapter adapter = new RankAdapter(mRankList);
         rankRecyclerView.setAdapter(adapter);
-
+        exitRankButton = (Button) findViewById(R.id.exit_rank);
+        exitRankButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RankActivity.this,StartActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void loadRank() {
