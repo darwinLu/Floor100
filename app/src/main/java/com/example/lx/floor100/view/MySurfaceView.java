@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -215,9 +216,13 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             mediaPlayer.setLooping(true);
             mediaPlayer.start();
         }
-        soundPool = new SoundPool.Builder()
-                .setMaxStreams(100)
-                .build();
+        if (Build.VERSION.SDK_INT >= 21) {
+            soundPool = new SoundPool.Builder()
+                    .setMaxStreams(100)
+                    .build();
+        } else {
+            soundPool = new SoundPool(100, AudioManager.STREAM_MUSIC, 0);
+        }
         jumpSound = soundPool.load(this.getContext(),R.raw.jump,0);
         powerSound = soundPool.load(this.getContext(),R.raw.power,0);
 
@@ -270,6 +275,11 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         bmpSpringPlatform = BitmapFactory.decodeResource(this.getResources(), R.drawable.spring_platform);
         bmpSpringPlatformCompress = BitmapFactory.decodeResource(this.getResources(), R.drawable.spring_platform_compress);
         bmpSpringPlatformUncompress = BitmapFactory.decodeResource(this.getResources(), R.drawable.spring_platform_uncompress);
+        //按比例缩放图片资源
+//        float scalePlayerWidth = (((float)screenW)/10)/(float)bmpPlayer.getWidth();
+//        Matrix matrix = new Matrix();
+//        matrix.postScale(scalePlayerWidth,1);
+//        Bitmap newBmpPlayer = Bitmap.createBitmap(bmpPlayer,0,0,bmpPlayer.getWidth(),bmpPlayer.getHeight(),matrix,false);
         //初始化游戏对象
         //清除平台列表
         platformList.clear();
@@ -288,6 +298,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         }
         //主角
         player = new Player(bmpPlayer,bmpPlayerJump);
+        //player = new Player(newBmpPlayer,bmpPlayerJump);
         updateObjects.add(player);
         //设置主角初始所在的平台
         player.platform = floor;

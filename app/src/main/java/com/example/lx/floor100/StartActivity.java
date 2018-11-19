@@ -16,7 +16,7 @@ import android.widget.ImageView;
 public class StartActivity extends AppCompatActivity {
 
     ImageView titleImageView;
-    Button startButton,rankingListButton,optionButton,exitButton;
+    Button startButton,rankingListButton,optionButton,exitButton,testButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +57,15 @@ public class StartActivity extends AppCompatActivity {
             }
         });
         createOption();
+        testButton = (Button) findViewById(R.id.test_button);
+        testButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(StartActivity.this,TestActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     private void createOption() {
