@@ -10,7 +10,7 @@ import com.example.lx.floor100.view.MySurfaceView;
  * Created by lx on 2018-08-06.
  */
 
-public class BackGround {
+public class Background {
 
     private Bitmap bmpBackGround1;
     private Bitmap bmpBackGround2;
@@ -19,7 +19,7 @@ public class BackGround {
 
     public int speed;
 
-    public BackGround(Bitmap bmpBackGround){
+    public Background(Bitmap bmpBackGround){
         this.bmpBackGround1 = bmpBackGround;
         this.bmpBackGround2 = bmpBackGround;
 

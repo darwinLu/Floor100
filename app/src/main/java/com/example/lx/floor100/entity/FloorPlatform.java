@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.view.View;
 
 import com.example.lx.floor100.view.MySurfaceView;
 
@@ -13,8 +14,8 @@ import com.example.lx.floor100.view.MySurfaceView;
 
 public class FloorPlatform extends Platform {
 
-    public FloorPlatform(int platform_x, int platform_y, int length, Bitmap bmpPlatform) {
-        super(platform_x, platform_y, length, bmpPlatform);
+    public FloorPlatform(int platform_x, int platform_y, int length, Bitmap bmpPlatform,View gameView) {
+        super(platform_x, platform_y, length, bmpPlatform,gameView);
     }
 
     @Override

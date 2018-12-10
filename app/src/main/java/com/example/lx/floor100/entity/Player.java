@@ -4,8 +4,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.drawable.ScaleDrawable;
 import android.view.MotionEvent;
+import android.view.View;
 
 import com.example.lx.floor100.R;
 import com.example.lx.floor100.engine.Entity;
@@ -18,17 +21,25 @@ import com.example.lx.floor100.view.MySurfaceView;
 
 public class Player extends Entity implements IUpdate {
 
-    //主角实时位置，代表主角左上角位置
+    //帧动画总数，用来切分帧动画图
+    private int frameCount = 11;
+
+    //帧动画的宽度，可以用传入的图片长度除以总帧数（单行横向帧图）
+    public int frameW;
+    //帧动画的高度，等于传入图片的高度（单行横向帧图）
+    public int frameH;
+
+    //主角的实际图像与帧图切分后的图像的水平和垂直间距
+    private int xPadding = 5;
+    private int yPadding = 1;
+
+    //主角的实际宽度和高度，代表有效的碰撞体积，可以用帧图宽高减去间距得到
+    public int playerRealWidth;
+    public int playerRealHeight;
+
+    //主角实时位置，代表主角的实际有效图形的左上角位置
     public int x;
     public int y;
-
-    //主角的实际图像和帧图切分后的图像距离
-    private int paddingX;
-    private int paddingY;
-
-    //主角的宽度和高度，代表实际的碰撞体积
-    public int playerWidth;
-    public int playerHeight;
 
     //水平方向移动初速度，每次主循环的移动增量
     private int moveSpeed = 5;
@@ -69,27 +80,39 @@ public class Player extends Entity implements IUpdate {
     private int currentFrame = 0;
     private int changeFrameCount;
 
-    //主角帧动画的宽度和高度，结合主角的实际宽高，可以确定如何裁剪帧动画
-    public int frameW;
-    public int frameH;
+
 
     //控制角色帧图在第几行循环
     private int indexLine;
 
 
+
+
     //构造函数
-    public Player(Bitmap bmpPlayer,Bitmap bmpPlayerJump){
-        this.bmpPlayer = bmpPlayer;
+    public Player(Bitmap bmpPlayer,Bitmap bmpPlayerJump,View gameView){
         this.bmpPlayerJump = bmpPlayerJump;
-//        frameW = bmpPlayer.getWidth()/4 - 20;
-//        frameH = bmpPlayer.getHeight()/4 - 30;
-        frameW = bmpPlayer.getWidth()/8;
+        this.bmpPlayer = bmpPlayer;
+        frameW = bmpPlayer.getWidth()/frameCount;
         frameH = bmpPlayer.getHeight();
-        playerWidth = bmpPlayer.getWidth()/8 - 10;
-        playerHeight = bmpPlayer.getHeight() - 20;
+        playerRealWidth = frameW - xPadding*2;
+        playerRealHeight = frameH - yPadding*2;
+        scaleBitmap(playerRealWidth,playerRealHeight,gameView);
         this.x = 0;
-        this.y = MySurfaceView.screenH - playerHeight - 80;
+        this.y = gameView.getHeight() - playerRealHeight - Platform.THICKNESS;
         isMoving = true;
+    }
+
+    private void scaleBitmap(int playerRealWidthOrigin,int playerRealHeightOrigin,View gameView) {
+        float scalePlayerWidth = (((float)gameView.getWidth())/8)/(float)playerRealWidthOrigin;
+        Matrix matrix = new Matrix();
+        matrix.postScale(scalePlayerWidth,scalePlayerWidth);
+        bmpPlayer = Bitmap.createBitmap(bmpPlayer,0,0,bmpPlayer.getWidth(),bmpPlayer.getHeight(),matrix,false);
+        bmpPlayerJump = Bitmap.createBitmap(bmpPlayerJump,0,0,bmpPlayerJump.getWidth(),bmpPlayerJump.getHeight(),matrix,false);
+        frameW = bmpPlayer.getWidth()/frameCount;
+        frameH = bmpPlayer.getHeight();
+        xPadding = (int)((float)xPadding * scalePlayerWidth);
+        playerRealWidth = frameW - xPadding*2;
+        playerRealHeight = frameH - yPadding*2;
     }
 
     //此函数在每次主循环中执行一次
@@ -188,31 +211,31 @@ public class Player extends Entity implements IUpdate {
 
     public void playerDraw(Canvas canvas, Paint paint){
         if(!isJumping){
-            int frame_x = currentFrame % 8 * frameW;
+            int frame_x = currentFrame % frameCount * frameW;
             int frame_y = frameH * indexLine;
 //        int frame_x = currentFrame % 4 * (bmpPlayer.getWidth()/4) + 10;
 //        int frame_y = currentFrame / 4 * (bmpPlayer.getHeight()/4) + 15;
             canvas.save();
-            canvas.clipRect(x,y,x+playerWidth,y+playerHeight);
+            canvas.clipRect(x,y,x+playerRealWidth,y+playerRealHeight);
             //canvas.clipRect(x,y,x+frameW,y+frameH);
             if(direction == DIRCTION_LEFT){
                 canvas.scale(-1,1,x-frame_x+bmpPlayer.getWidth()/2,y-frame_y+bmpPlayer.getHeight()/2);
                 //canvas.scale(-1,1,x-frame_x+frameW,y-frame_y+frameH);
             }
-            canvas.drawBitmap(bmpPlayer,x-frame_x-5,y-frame_y-10,paint);
+            canvas.drawBitmap(bmpPlayer,x-frame_x-xPadding,y-frame_y-yPadding,paint);
             //paint.setColor(Color.RED);
             //canvas.drawRect(x,y,x+playerWidth,y+playerHeight,paint);
             canvas.restore();
         }
         else if (isJumping){
             canvas.save();
-            canvas.clipRect(x,y,x+playerWidth,y+playerHeight);
+            canvas.clipRect(x,y,x+playerRealWidth,y+playerRealHeight);
             //paint.setColor(Color.RED);
             if(direction == DIRCTION_LEFT){
                 canvas.scale(-1,1,x+bmpPlayerJump.getWidth()/2,y+bmpPlayerJump.getHeight()/2);
                 //canvas.scale(-1,1,x-frame_x+frameW,y-frame_y+frameH);
             }
-            canvas.drawBitmap(bmpPlayerJump,x-5,y-10,paint);
+            canvas.drawBitmap(bmpPlayerJump,x-xPadding,y-yPadding,paint);
             //canvas.drawRect(x,y,x+playerWidth,y+playerHeight,paint);
             canvas.restore();
         }
@@ -230,7 +253,7 @@ public class Player extends Entity implements IUpdate {
     public boolean isCollisionWithPlatform(Platform platform){
         if(vy<=0){
             if(x+frameW>platform.x && x<platform.x+platform.length){
-                if(Math.abs(y+playerHeight - platform.y)<10){
+                if(Math.abs(y+playerRealHeight - platform.y)<10){
                     return true;
                 }
                 else {

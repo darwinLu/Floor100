@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.view.View;
 
 import com.example.lx.floor100.view.MySurfaceView;
 
@@ -19,8 +20,8 @@ public class LRPlatform extends Platform {
     private int init_x;
     private int direction = DIRCTION_RIGHT;
 
-    public LRPlatform(int platform_x, int platform_y, int length, Bitmap bmpPlatform) {
-        super(platform_x, platform_y, length, bmpPlatform);
+    public LRPlatform(int platform_x, int platform_y, int length, Bitmap bmpPlatform,View gameView) {
+        super(platform_x, platform_y, length, bmpPlatform,gameView);
         init_x = platform_x;
     }
 

@@ -3,7 +3,9 @@ package com.example.lx.floor100.entity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.view.View;
 
 import com.example.lx.floor100.engine.Entity;
 import com.example.lx.floor100.engine.IUpdate;
@@ -26,19 +28,36 @@ public class Platform extends Entity implements IUpdate {
     //平台间距
     static public int SPACE = 300;
     //平台厚度
-    static public int THICKNESS = 80;
+    static public int THICKNESS;
     //平台是否有效的标志位
     public boolean isOnScreen;
 
+    private int platformRealWidth;
+    private int platformRealHeight;
 
-    public Platform(int platform_x, int platform_y, int length, Bitmap bmpPlatform) {
+
+    public Platform(int platform_x, int platform_y, int length, Bitmap bmpPlatform,View gameView) {
         this.x = platform_x;
         this.y = platform_y;
         this.length = length;
 //        this.number = number;
         this.bmpPlatform = bmpPlatform;
+        platformRealWidth = bmpPlatform.getWidth();
+        platformRealHeight = bmpPlatform.getHeight();
+        scaleBitmap(platformRealWidth,platformRealHeight,gameView);
         //平台实例化时初始为有效，显示在屏幕上
         this.isOnScreen = true;
+    }
+
+    private void scaleBitmap(int platformRealWidthOrigin, int platformRealHeightOrigin, View gameView) {
+        float scalePlatformHeight = (((float)gameView.getHeight())/20)/(float)platformRealHeightOrigin;
+        Matrix matrix = new Matrix();
+        matrix.postScale(scalePlatformHeight,scalePlatformHeight);
+        bmpPlatform = Bitmap.createBitmap(bmpPlatform,0,0,bmpPlatform.getWidth(),bmpPlatform.getHeight(),matrix,false);
+        platformRealWidth = bmpPlatform.getWidth();
+        platformRealHeight = bmpPlatform.getHeight();
+        THICKNESS = bmpPlatform.getHeight();
+        length = bmpPlatform.getWidth();
     }
 
     public void platformDraw(Canvas canvas){

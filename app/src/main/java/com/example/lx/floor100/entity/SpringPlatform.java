@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.view.View;
 
 import com.example.lx.floor100.view.MySurfaceView;
 
@@ -31,8 +32,8 @@ public class SpringPlatform extends Platform {
 
     private int i=0;
 
-    public SpringPlatform(int platform_x, int platform_y, int length, Bitmap bmpPlatform,Bitmap bmpSpringPlatformCompress,Bitmap bmpSpringPlatformUncompress) {
-        super(platform_x, platform_y, length, bmpPlatform);
+    public SpringPlatform(int platform_x, int platform_y, int length, Bitmap bmpPlatform,Bitmap bmpSpringPlatformCompress,Bitmap bmpSpringPlatformUncompress,View gameView) {
+        super(platform_x, platform_y, length, bmpPlatform,gameView);
         this.bmpSpringPlatformCompress = bmpSpringPlatformCompress;
         this.bmpSpringPlatformUncompress = bmpSpringPlatformUncompress;
         this.bmpSpringPlatformNormal = bmpPlatform;

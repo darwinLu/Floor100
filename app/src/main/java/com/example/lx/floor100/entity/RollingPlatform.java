@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.view.View;
 
 import com.example.lx.floor100.view.MySurfaceView;
 
@@ -28,8 +29,8 @@ public class RollingPlatform extends Platform {
     public int frameW;
     public int frameH;
 
-    public RollingPlatform(int platform_x, int platform_y, int length, Bitmap bmpPlatform) {
-        super(platform_x, platform_y, length, bmpPlatform);
+    public RollingPlatform(int platform_x, int platform_y, int length, Bitmap bmpPlatform,View gameView) {
+        super(platform_x, platform_y, length, bmpPlatform,gameView);
         Random rand = new Random();
         direction = rand.nextInt(2);
         frameW = bmpPlatform.getWidth()/8;
