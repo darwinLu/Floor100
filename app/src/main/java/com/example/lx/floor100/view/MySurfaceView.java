@@ -64,28 +64,40 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     //△t
     public static final int DELTA_TIME = 1000 / FRAME_PRE_SECOND;
 
-    public static int screenW, screenH;
-
+    //SurfaceView绘图对象
     private SurfaceHolder sfh;
     private Canvas canvas;
     private Paint paint;
-
-    private ObjectSizeManager objectSizeManager;
 
     //主循环线程
     private Thread gameLoopThread;
     //主循环标志
     private boolean gameIsRunning;
 
+    //游戏对象尺寸管理器
+    private ObjectSizeManager objectSizeManager;
+
+    //游戏对象
     private Background background;
     public Player player;
     private Platform floor;
     private LinkedList<Platform> platformList = new LinkedList<>();
     private int platformNumber;
+    //HUD
     public Progress progress;
     public Rank rank;
 
-    //图片
+    //游戏对象更新容器
+    private List<IUpdate> updateObjects = new ArrayList<>();
+
+    //随机数生成器，用来随机生成不同类型的平台
+    Random rand = new Random();
+
+    //是否滚动背景标志及背景滚动距离
+    public boolean isRollingBackground = false;
+    public int rollingDistance = 0;
+
+    //图片资源
     private Bitmap bmpPlayer;
     private Bitmap bmpPlayerJump;
     private Bitmap bmpPlatform;
@@ -96,18 +108,10 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private Bitmap bmpSpringPlatformCompress;
     private Bitmap bmpSpringPlatformUncompress;
 
-    private List<IUpdate> updateObjects = new ArrayList<>();
-
-    //是否滚动背景标志
-    public boolean isRollingBackground = false;
-    private int bg_x = 0;
-    private int bg_y = 0;
-    public int rollingDistance = 0;
-
-    Random rand = new Random();
-
+    //弹出菜单handler
     private Handler mHandler;
-    //音乐
+
+    //音乐控制
     private final int MEDIAPLAYER_PAUSE = 0;
     private final int MEDIAPLAYER_PLAY = 1;
     private final int MEDIAPLAYER_STOP = 2;
@@ -118,7 +122,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private int currentVol;
     private int setTime = 5000;
     private AudioManager am;
-    //音效
+
+    //音效控制
     public SoundPool soundPool;
     public int jumpSound;
     public int powerSound;
@@ -129,6 +134,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         sfh = this.getHolder();
         sfh.addCallback(this);
         setFocusable(true);
+        //暂停菜单
         mHandler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
@@ -166,7 +172,6 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                         ((MainActivity)context).finish();
                     }
                 });
-                //gameIsRunning = false;
             }
         };
     }
@@ -208,6 +213,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+        //播放音乐和音效
         if(getContext().getSharedPreferences("option",Context.MODE_PRIVATE).getString("music_switch","off").equals("on")){
             mediaPlayer = MediaPlayer.create(this.getContext(),R.raw.bgm1);
             mediaPlayer.setLooping(true);
@@ -222,20 +228,9 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         }
         jumpSound = soundPool.load(this.getContext(),R.raw.jump,0);
         powerSound = soundPool.load(this.getContext(),R.raw.power,0);
-
-//        musicMaxTime = mediaPlayer.getDuration();
-        //am = (AudioManager)this.getContext().getSystemService(Context.AUDIO_SERVICE);
-        //((MainActivity)this.getContext()).setVolumeControlStream(AudioManager.STREAM_MUSIC);
-//        try {
-//            mediaPlayer.prepare();
-//            mediaPlayer.start();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
+        //开始游戏
         gameLoopThread = new Thread(this);
         gameLoopThread.start();
-
     }
 
     @Override
@@ -257,13 +252,9 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void init_game() {
-        //获取屏幕高度宽度
-        screenW = this.getWidth();
-        screenH = this.getHeight();
-        //初始化对象大小管理器
-        objectSizeManager = ObjectSizeManager.getObjectSizeManager();
-        objectSizeManager.setScreenW(screenW);
-        objectSizeManager.setScreenH(screenH);
+        //初始化对象大小管理器，并初始化游戏对象的实际显示大小
+        objectSizeManager = ObjectSizeManager.getInstance();
+        objectSizeManager.initGameObjectSize(this);
         //初始化画笔
         paint = new Paint();
         //加载图片资源
@@ -276,24 +267,20 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
         bmpSpringPlatform = BitmapFactory.decodeResource(this.getResources(), R.drawable.spring_platform);
         bmpSpringPlatformCompress = BitmapFactory.decodeResource(this.getResources(), R.drawable.spring_platform_compress);
         bmpSpringPlatformUncompress = BitmapFactory.decodeResource(this.getResources(), R.drawable.spring_platform_uncompress);
-        //按比例缩放图片资源
-//        float scalePlayerWidth = (((float)screenW)/10)/(float)bmpPlayer.getWidth();
-//        Matrix matrix = new Matrix();
-//        matrix.postScale(scalePlayerWidth,1);
-//        Bitmap newBmpPlayer = Bitmap.createBitmap(bmpPlayer,0,0,bmpPlayer.getWidth(),bmpPlayer.getHeight(),matrix,false);
         //初始化游戏对象
         //背景
         background = new Background(bmpBackground);
         //清除平台列表
         platformList.clear();
         //地面
-        floor = new FloorPlatform(0,screenH-Platform.THICKNESS,screenW,bmpFloorPlatform,this);
+        floor = new FloorPlatform(0,bmpFloorPlatform);
         platformList.add(0,floor);
-        //平台
-        platformNumber = screenH/(Platform.SPACE+Platform.THICKNESS)+2;
-        //生成初始平台
+        //计算初始平台数，通过屏幕高度和平台厚度、距离计算，然后多生成2个平台以便预加载
+        platformNumber = ObjectSizeManager.getInstance().getScreenH()/(objectSizeManager.getPlatformSpace()+objectSizeManager.getPlatformThickness())+2;
+        //生成初始平台添加到平台绘制集合
         for(int i=1;i<=platformNumber;i++){
-            platformList.add(i,new Platform(-110+ screenW/10*rand.nextInt(10),screenH - (i)*(Platform.SPACE+Platform.THICKNESS),400,bmpPlatform,this));
+            //需要修改，平台的生成位置由自己来生成
+            platformList.add(i,new Platform(i,bmpPlatform));
         }
         //添加所有平台到更新列表
         for(int i=0;i<platformList.size();i++){
@@ -320,7 +307,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
                 canvas.drawColor(Color.BLACK);
                 background.draw(canvas,paint);
                 for(Iterator<Platform> platformIterator = platformList.iterator();platformIterator.hasNext();){
-                    platformIterator.next().platformDraw(canvas);
+                    platformIterator.next().platformDraw(canvas,paint);
                 }
                 player.playerDraw(canvas,paint);
                 progress.draw(canvas,paint);
@@ -358,25 +345,25 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void checkEveryPlatformIsDead() {
-        if(platformList.getFirst().y>screenH){
+        if(platformList.getFirst().y>objectSizeManager.getInstance().getScreenH()){
             platformList.remove();
             rank.addRank();
             int typeNumber = rand.nextInt(10);
             Platform newPlatform;
             if(typeNumber>7){
-                newPlatform = new Platform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),400,bmpPlatform,this);
+                newPlatform = new Platform(platformList.size()+1,bmpPlatform);
             }
             else if(typeNumber>3 && typeNumber<=7){
-                newPlatform = new RollingPlatform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),400,bmpRollingPlatform,this);
+                newPlatform = new RollingPlatform(platformList.size()+1,bmpRollingPlatform);
             }
             else if(typeNumber>2 && typeNumber<=3){
-                newPlatform = new UDPlatform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),400,bmpPlatform,this);
+                newPlatform = new UDPlatform(platformList.size()+1,bmpPlatform);
             }
             else if(typeNumber>1 && typeNumber<=2){
-                newPlatform = new SpringPlatform(-110+ screenW/10*typeNumber,screenH - (platformList.size()+1)*(Platform.SPACE+Platform.THICKNESS),400,bmpSpringPlatform,bmpSpringPlatformCompress,bmpSpringPlatformUncompress,this);
+                newPlatform = new SpringPlatform(platformList.size()+1,bmpSpringPlatform,bmpSpringPlatformCompress,bmpSpringPlatformUncompress);
             }
             else {
-                newPlatform = new LRPlatform(-110 + screenW / 10 * typeNumber, screenH - (platformList.size() + 1) * (Platform.SPACE + Platform.THICKNESS), 400, bmpPlatform,this);
+                newPlatform = new LRPlatform(platformList.size() + 1, bmpPlatform);
             }
             platformList.add(newPlatform);
             updateObjects.add(newPlatform);
@@ -394,7 +381,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
             //使用光线投射法检测碰撞
             for(int i=0;i<platformList.size();i++){
                 if(player.isCollisionWithPlatform((Platform)platformList.get(i))){
-                    player.y = ((Platform) platformList.get(i)).y - player.playerRealHeight;
+                    player.y = ((Platform) platformList.get(i)).y - objectSizeManager.getPlayerHeight();
                     player.isJumping = false;
                     player.isOnPlatform = true;
                     player.platform = (Platform)platformList.get(i);
@@ -408,7 +395,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void checkGameOver() {
-        if(player.y>screenH + player.playerRealHeight){
+        if(player.y>objectSizeManager.getInstance().getScreenH() + objectSizeManager.getPlayerHeight()){
             Message message = new Message();
             Bundle bundle = new Bundle();
             bundle.putInt("score",rank.getCurrentRank());

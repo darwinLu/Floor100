@@ -9,7 +9,10 @@ import android.view.View;
 
 import com.example.lx.floor100.engine.Entity;
 import com.example.lx.floor100.engine.IUpdate;
+import com.example.lx.floor100.engine.ObjectSizeManager;
 import com.example.lx.floor100.view.MySurfaceView;
+
+import java.util.Random;
 
 /**
  * Created by lx on 2017-06-19.
@@ -17,63 +20,62 @@ import com.example.lx.floor100.view.MySurfaceView;
 
 public class Platform extends Entity implements IUpdate {
 
-    //平台位置
-    public int x;
+    //平台显示位置左上角坐标
+    public int x,y;
+    //平台实际显示宽度和高度
+    private int platformWidthOnScreen;
+    private int platformHeightOnScreen;
     //平台长度
     public int length;
-    //平台序号
-//    public int number;
     //平台图片
     protected Bitmap bmpPlatform;
-    //平台间距
-    static public int SPACE = 300;
-    //平台厚度
-    static public int THICKNESS;
+    //缩放后平台图片
+    private Bitmap platformBitmapOnScreen;
     //平台是否有效的标志位
     public boolean isOnScreen;
 
-    private int platformRealWidth;
-    private int platformRealHeight;
+    float scaleFactor;
 
+    //随机数,随机产生平台对屏幕的偏移
+    private Random rand = new Random();
 
-    public Platform(int platform_x, int platform_y, int length, Bitmap bmpPlatform,View gameView) {
-        this.x = platform_x;
-        this.y = platform_y;
-        this.length = length;
-//        this.number = number;
+    public Platform(int existPlatformNumber,Bitmap bmpPlatform){
         this.bmpPlatform = bmpPlatform;
-        platformRealWidth = bmpPlatform.getWidth();
-        platformRealHeight = bmpPlatform.getHeight();
-        scaleBitmap(platformRealWidth,platformRealHeight,gameView);
+        countPlatformWidthOnScreen();
+        this.x = -ObjectSizeManager.getInstance().getPlatformWidth()/2 + ObjectSizeManager.getInstance().getScreenW()/10*rand.nextInt(10);
+        this.y = ObjectSizeManager.getInstance().getScreenH() - (existPlatformNumber)*(ObjectSizeManager.getInstance().getPlatformSpace()+ObjectSizeManager.getInstance().getPlatformThickness());
+        this.length = ObjectSizeManager.getInstance().getPlatformWidth();
+        scalePlatformBitmap();
         //平台实例化时初始为有效，显示在屏幕上
         this.isOnScreen = true;
     }
 
-    private void scaleBitmap(int platformRealWidthOrigin, int platformRealHeightOrigin, View gameView) {
-        float scalePlatformHeight = (((float)gameView.getHeight())/20)/(float)platformRealHeightOrigin;
-        Matrix matrix = new Matrix();
-        matrix.postScale(scalePlatformHeight,scalePlatformHeight);
-        bmpPlatform = Bitmap.createBitmap(bmpPlatform,0,0,bmpPlatform.getWidth(),bmpPlatform.getHeight(),matrix,false);
-        platformRealWidth = bmpPlatform.getWidth();
-        platformRealHeight = bmpPlatform.getHeight();
-        THICKNESS = bmpPlatform.getHeight();
-        length = bmpPlatform.getWidth();
+    private void countPlatformWidthOnScreen() {
+        scaleFactor = (((float) ObjectSizeManager.getInstance().getPlatformThickness()))/(float)bmpPlatform.getHeight();
+        platformWidthOnScreen = (int)((float)bmpPlatform.getWidth()*scaleFactor);
+        ObjectSizeManager.getInstance().setPlatformWidth(platformWidthOnScreen);
+        platformHeightOnScreen = ObjectSizeManager.getInstance().getPlatformThickness();
     }
 
-    public void platformDraw(Canvas canvas){
-//        canvas.drawBitmap(bmpPlatform,x,y,paint);
-        Paint paint = new Paint();
-        paint.setColor(Color.RED);
+    private void scalePlatformBitmap() {
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleFactor,scaleFactor);
+       platformBitmapOnScreen = Bitmap.createBitmap(bmpPlatform,
+                0,0,
+                bmpPlatform.getWidth(),bmpPlatform.getHeight(),
+                matrix,false);
+    }
+
+    public void platformDraw(Canvas canvas,Paint paint){
         if(isOnScreen) {
-            canvas.drawBitmap(bmpPlatform,x,y,null);
-            //canvas.drawRect(x, y, x + length, y + THICKNESS, paint);
+            canvas.drawBitmap(platformBitmapOnScreen,x,y,paint);
         }
     }
 
 
     @Override
     public void update(MySurfaceView view) {
-        if(y>MySurfaceView.screenH){
+        if(y>ObjectSizeManager.getInstance().getScreenH()){
             isOnScreen = false;
         }
     }

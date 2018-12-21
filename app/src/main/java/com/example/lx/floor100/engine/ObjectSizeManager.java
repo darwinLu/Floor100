@@ -1,20 +1,33 @@
 package com.example.lx.floor100.engine;
 
+import android.view.View;
+
 /**
  * Created by lx on 2018-12-07.
  */
 
 public class ObjectSizeManager {
 
-    private static ObjectSizeManager objectSizeManager;
+    private static final ObjectSizeManager objectSizeManagerInstance = new ObjectSizeManager();
 
-    public int getScreenW() {
-        return screenW;
+    private ObjectSizeManager(){
     }
 
-    public void setScreenW(int screenW) {
-        this.screenW = screenW;
+    public static ObjectSizeManager getInstance(){
+        return objectSizeManagerInstance;
     }
+
+    private int screenW;
+    private int screenH;
+    private int playerWidth;
+    private int playerHeight;
+    private int platformWidth;
+    private int platformThickness;
+    private int platformSpace;
+    private int backgroundWidth;
+    private int backgroundHeight;
+    private int floorWidth;
+    private int floorHeight;
 
     public int getScreenH() {
         return screenH;
@@ -23,13 +36,6 @@ public class ObjectSizeManager {
     public void setScreenH(int screenH) {
         this.screenH = screenH;
     }
-
-    public int screenW;
-    public int screenH;
-    public int playerWidth;
-    public int playerHeight;
-    public int platformWidth;
-    public int platformHeight;
 
     public int getPlayerWidth() {
         return playerWidth;
@@ -55,25 +61,69 @@ public class ObjectSizeManager {
         this.platformWidth = platformWidth;
     }
 
-    public int getPlatformHeight() {
-        return platformHeight;
+    public int getPlatformThickness() {
+        return platformThickness;
     }
 
-    public void setPlatformHeight(int platformHeight) {
-        this.platformHeight = platformHeight;
+    public void setPlatformThickness(int platformThickness) {
+        this.platformThickness = platformThickness;
     }
 
-    private ObjectSizeManager(){
+    public int getPlatformSpace() {
+        return platformSpace;
     }
 
-    public static ObjectSizeManager getObjectSizeManager(){
-        if(objectSizeManager != null){
-            objectSizeManager = new ObjectSizeManager();
-            return objectSizeManager;
-        }
-        else {
-            return objectSizeManager;
-        }
+    public void setPlatformSpace(int platformSpace) {
+        this.platformSpace = platformSpace;
     }
 
+    public int getScreenW() {
+        return screenW;
+    }
+
+    public void setScreenW(int screenW) {
+        this.screenW = screenW;
+    }
+
+    public int getBackgroundWidth() {
+        return backgroundWidth;
+    }
+
+    public void setBackgroundWidth(int backgroundWidth) {
+        this.backgroundWidth = backgroundWidth;
+    }
+
+    public int getBackgroundHeight() {
+        return backgroundHeight;
+    }
+
+    public void setBackgroundHeight(int backgroundHeight) {
+        this.backgroundHeight = backgroundHeight;
+    }
+
+    public int getFloorWidth() {
+        return floorWidth;
+    }
+
+    public void setFloorWidth(int floorWidth) {
+        this.floorWidth = floorWidth;
+    }
+
+    public int getFloorHeight() {
+        return floorHeight;
+    }
+
+    public void setFloorHeight(int floorHeight) {
+        this.floorHeight = floorHeight;
+    }
+
+    public void initGameObjectSize(View gameView){
+        this.setScreenW(gameView.getWidth());
+        this.setScreenH(gameView.getHeight());
+        this.setPlayerWidth(screenW/8);
+        this.setPlatformThickness(screenH/20);
+        this.setPlatformSpace(screenH/10);
+        this.setBackgroundWidth(screenW);
+        this.setFloorWidth(screenW);
+    }
 }

@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.drawable.ScaleDrawable;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.view.View;
 import com.example.lx.floor100.R;
 import com.example.lx.floor100.engine.Entity;
 import com.example.lx.floor100.engine.IUpdate;
+import com.example.lx.floor100.engine.ObjectSizeManager;
 import com.example.lx.floor100.view.MySurfaceView;
 
 /**
@@ -29,17 +31,18 @@ public class Player extends Entity implements IUpdate {
     //帧动画的高度，等于传入图片的高度（单行横向帧图）
     public int frameH;
 
-    //主角的实际图像与帧图切分后的图像的水平和垂直间距
-    private int xPadding = 5;
-    private int yPadding = 1;
-
-    //主角的实际宽度和高度，代表有效的碰撞体积，可以用帧图宽高减去间距得到
-    public int playerRealWidth;
-    public int playerRealHeight;
+    //主角的实际图像距离帧图各边的边距
+    private int leftPadding = 5;
+    private int rightPadding = 5;
+    private int topPadding = 1;
+    private int bottomPadding = 20;
 
     //主角实时位置，代表主角的实际有效图形的左上角位置
     public int x;
     public int y;
+    //主角的实际宽度和高度，代表有效的碰撞体积，可以用帧图宽高减去各方向间距
+    private int playerWidthOnScreen;
+    private int playerHeightOnScreen;
 
     //水平方向移动初速度，每次主循环的移动增量
     private int moveSpeed = 5;
@@ -62,10 +65,6 @@ public class Player extends Entity implements IUpdate {
     public boolean isMoving;
     //是否跳跃的标志
     public boolean isJumping;
-    //处于上升段标志
-    public boolean isRising;
-    //处于下降段标志
-    public boolean isFalling;
 
     //当前主角所在的platform
     public Platform platform;
@@ -80,40 +79,63 @@ public class Player extends Entity implements IUpdate {
     private int currentFrame = 0;
     private int changeFrameCount;
 
-
-
     //控制角色帧图在第几行循环
     private int indexLine;
 
-
+    //缩放系数
+    private float scaleFactor;
 
 
     //构造函数
     public Player(Bitmap bmpPlayer,Bitmap bmpPlayerJump,View gameView){
         this.bmpPlayerJump = bmpPlayerJump;
         this.bmpPlayer = bmpPlayer;
-        frameW = bmpPlayer.getWidth()/frameCount;
-        frameH = bmpPlayer.getHeight();
-        playerRealWidth = frameW - xPadding*2;
-        playerRealHeight = frameH - yPadding*2;
-        scaleBitmap(playerRealWidth,playerRealHeight,gameView);
+        //frameW = bmpPlayer.getWidth()/frameCount;
+        //frameH = bmpPlayer.getHeight();
+        //playerRealWidth = frameW - leftPadding - rightPadding;
+        //playerRealHeight = frameH - topPadding  - bottomPadding;
+        //scaleBitmap(playerRealWidth,playerRealHeight,gameView);
+        playerWidthOnScreen = ObjectSizeManager.getInstance().getPlayerWidth();
+        countPlayerHeightOnScreen();
+        //platformThickness = ObjectSizeManager.getInstance().getPlatformThickness();
         this.x = 0;
-        this.y = gameView.getHeight() - playerRealHeight - Platform.THICKNESS;
+        this.y = gameView.getHeight() - ObjectSizeManager.getInstance().getPlayerHeight() - ObjectSizeManager.getInstance().getFloorHeight();
         isMoving = true;
     }
 
-    private void scaleBitmap(int playerRealWidthOrigin,int playerRealHeightOrigin,View gameView) {
-        float scalePlayerWidth = (((float)gameView.getWidth())/8)/(float)playerRealWidthOrigin;
-        Matrix matrix = new Matrix();
-        matrix.postScale(scalePlayerWidth,scalePlayerWidth);
-        bmpPlayer = Bitmap.createBitmap(bmpPlayer,0,0,bmpPlayer.getWidth(),bmpPlayer.getHeight(),matrix,false);
-        bmpPlayerJump = Bitmap.createBitmap(bmpPlayerJump,0,0,bmpPlayerJump.getWidth(),bmpPlayerJump.getHeight(),matrix,false);
+    private void countPlayerHeightOnScreen() {
         frameW = bmpPlayer.getWidth()/frameCount;
         frameH = bmpPlayer.getHeight();
-        xPadding = (int)((float)xPadding * scalePlayerWidth);
-        playerRealWidth = frameW - xPadding*2;
-        playerRealHeight = frameH - yPadding*2;
+        int playerBitmapWidth = frameW - leftPadding - rightPadding;
+        scaleFactor = (((float)ObjectSizeManager.getInstance().getPlayerWidth()))/(float)playerBitmapWidth;
+        playerHeightOnScreen = (int)((float)bmpPlayer.getHeight()*scaleFactor);
+        ObjectSizeManager.getInstance().setPlayerHeight(playerHeightOnScreen);
+//
+//        Matrix matrix = new Matrix();
+//        matrix.postScale(scaleFactor,scaleFactor);
+//        bmpPlayer = Bitmap.createBitmap(bmpPlayer,0,0,bmpPlayer.getWidth(),bmpPlayer.getHeight(),matrix,false);
+//        bmpPlayerJump = Bitmap.createBitmap(bmpPlayerJump,0,0,bmpPlayerJump.getWidth(),bmpPlayerJump.getHeight(),matrix,false);
+//        frameW = bmpPlayer.getWidth();
+//        frameH = bmpPlayer.getHeight();
     }
+
+
+
+//    private void scaleBitmap(int playerRealWidthOrigin,int playerRealHeightOrigin,View gameView) {
+//        float scalePlayerWidth = (((float)gameView.getWidth())/8)/(float)playerRealWidthOrigin;
+//        Matrix matrix = new Matrix();
+//        matrix.postScale(scalePlayerWidth,scalePlayerWidth);
+//        bmpPlayer = Bitmap.createBitmap(bmpPlayer,0,0,bmpPlayer.getWidth(),bmpPlayer.getHeight(),matrix,false);
+//        bmpPlayerJump = Bitmap.createBitmap(bmpPlayerJump,0,0,bmpPlayerJump.getWidth(),bmpPlayerJump.getHeight(),matrix,false);
+//        frameW = bmpPlayer.getWidth()/frameCount;
+//        frameH = bmpPlayer.getHeight();
+//        leftPadding = (int)((float)leftPadding * scalePlayerWidth);
+//        rightPadding = (int)((float)rightPadding * scalePlayerWidth);
+//        topPadding = (int)((float)topPadding * scalePlayerWidth);
+//        bottomPadding = (int)((float)bottomPadding * scalePlayerWidth);
+//        //playerRealWidth = frameW - leftPadding - rightPadding;
+//        playerRealHeight = frameH - topPadding  - bottomPadding;
+//    }
 
     //此函数在每次主循环中执行一次
     @Override
@@ -156,10 +178,11 @@ public class Player extends Entity implements IUpdate {
 
     public void move(MySurfaceView view){
         //无论何种情况，水平方向都一直左右移动
+        int playerRealWidth = ObjectSizeManager.getInstance().getPlayerWidth();
         if(direction == DIRCTION_RIGHT){
             x = x + moveSpeed;
-            if(x + frameW > MySurfaceView.screenW){
-                x = MySurfaceView.screenW - frameW;
+            if(x + playerRealWidth > ObjectSizeManager.getInstance().getScreenW()){
+                x = ObjectSizeManager.getInstance().getScreenW() - playerRealWidth;
                 direction = DIRCTION_LEFT;
             }
         }
@@ -177,8 +200,8 @@ public class Player extends Entity implements IUpdate {
         int deltaY;
         if(vy > 0 && next_vy > 0) {
             vy = next_vy;
-            deltaY = (int)((MySurfaceView.screenH/100)*((vy * MySurfaceView.DELTA_TIME / 1000 + (g/2)*MySurfaceView.DELTA_TIME*MySurfaceView.DELTA_TIME/1000/1000)));
-            if((y - deltaY) <MySurfaceView.screenH/3){
+            deltaY = (int)((ObjectSizeManager.getInstance().getScreenH()/100)*((vy * MySurfaceView.DELTA_TIME / 1000 + (g/2)*MySurfaceView.DELTA_TIME*MySurfaceView.DELTA_TIME/1000/1000)));
+            if((y - deltaY) <ObjectSizeManager.getInstance().getScreenH()/3){
                 view.isRollingBackground = true;
                 view.rollingDistance = deltaY;
             }
@@ -193,13 +216,13 @@ public class Player extends Entity implements IUpdate {
             view.rollingDistance = 0;
 //            isRising = false;
 //            isFalling = true;
-            deltaY = (int)((MySurfaceView.screenH/100)*((vy * MySurfaceView.DELTA_TIME / 1000 + (g/2)*MySurfaceView.DELTA_TIME*MySurfaceView.DELTA_TIME/1000/1000)));
+            deltaY = (int)((ObjectSizeManager.getInstance().getScreenH()/100)*((vy * MySurfaceView.DELTA_TIME / 1000 + (g/2)*MySurfaceView.DELTA_TIME*MySurfaceView.DELTA_TIME/1000/1000)));
             y = y - deltaY;
             return;
         }
         if(vy<=0){
             vy = next_vy;
-            deltaY = (int)((MySurfaceView.screenH/100)*((vy * MySurfaceView.DELTA_TIME / 1000 + (g/2)*MySurfaceView.DELTA_TIME*MySurfaceView.DELTA_TIME/1000/1000)));
+            deltaY = (int)((ObjectSizeManager.getInstance().getScreenH()/100)*((vy * MySurfaceView.DELTA_TIME / 1000 + (g/2)*MySurfaceView.DELTA_TIME*MySurfaceView.DELTA_TIME/1000/1000)));
             y = y - deltaY;
         }
 //        if(y>MySurfaceView.screenH - frameH){
@@ -213,36 +236,55 @@ public class Player extends Entity implements IUpdate {
         if(!isJumping){
             int frame_x = currentFrame % frameCount * frameW;
             int frame_y = frameH * indexLine;
-//        int frame_x = currentFrame % 4 * (bmpPlayer.getWidth()/4) + 10;
-//        int frame_y = currentFrame / 4 * (bmpPlayer.getHeight()/4) + 15;
+            Matrix matrix = new Matrix();
+            matrix.postScale(scaleFactor,scaleFactor);
+            Bitmap playerBitmapOnScreen = Bitmap.createBitmap(bmpPlayer,
+                    frame_x+leftPadding,frame_y+topPadding,
+                    frameW - leftPadding - rightPadding,frameH - topPadding - bottomPadding,
+                    matrix,false);
             canvas.save();
-            canvas.clipRect(x,y,x+playerRealWidth,y+playerRealHeight);
+            canvas.clipRect(x,y,x+ObjectSizeManager.getInstance().getPlayerWidth(),
+                    y+ObjectSizeManager.getInstance().getPlayerHeight());
             //canvas.clipRect(x,y,x+frameW,y+frameH);
             if(direction == DIRCTION_LEFT){
-                canvas.scale(-1,1,x-frame_x+bmpPlayer.getWidth()/2,y-frame_y+bmpPlayer.getHeight()/2);
+                canvas.scale(-1,1,x+playerBitmapOnScreen.getWidth()/2,y+playerBitmapOnScreen.getHeight()/2);
                 //canvas.scale(-1,1,x-frame_x+frameW,y-frame_y+frameH);
+                canvas.drawBitmap(playerBitmapOnScreen,x,y,paint);
             }
-            canvas.drawBitmap(bmpPlayer,x-frame_x-xPadding,y-frame_y-yPadding,paint);
+            else{
+                canvas.drawBitmap(playerBitmapOnScreen,x,y,paint);
+            }
             //paint.setColor(Color.RED);
             //canvas.drawRect(x,y,x+playerWidth,y+playerHeight,paint);
             canvas.restore();
         }
         else if (isJumping){
+            Matrix matrix = new Matrix();
+            matrix.postScale(scaleFactor,scaleFactor);
+            Bitmap playerBitmapJumpOnScreen = Bitmap.createBitmap(bmpPlayerJump,
+                    leftPadding,topPadding,
+                    frameW - leftPadding - rightPadding,frameH - topPadding - bottomPadding,
+                    matrix,false);
             canvas.save();
-            canvas.clipRect(x,y,x+playerRealWidth,y+playerRealHeight);
+            canvas.clipRect(x,y,x+ObjectSizeManager.getInstance().getPlayerWidth(),
+                    y+ObjectSizeManager.getInstance().getPlayerHeight());
             //paint.setColor(Color.RED);
             if(direction == DIRCTION_LEFT){
-                canvas.scale(-1,1,x+bmpPlayerJump.getWidth()/2,y+bmpPlayerJump.getHeight()/2);
+                canvas.scale(-1,1,x+playerBitmapJumpOnScreen.getWidth()/2,y+playerBitmapJumpOnScreen.getHeight()/2);
                 //canvas.scale(-1,1,x-frame_x+frameW,y-frame_y+frameH);
+                canvas.drawBitmap(playerBitmapJumpOnScreen,x,y,paint);
             }
-            canvas.drawBitmap(bmpPlayerJump,x-xPadding,y-yPadding,paint);
+            else{
+                canvas.drawBitmap(playerBitmapJumpOnScreen,x,y,paint);
+            }
             //canvas.drawRect(x,y,x+playerWidth,y+playerHeight,paint);
             canvas.restore();
         }
     }
 
     public boolean isOutOfPlatform(){
-        if(x+frameW<platform.x || x>platform.x+platform.length){
+        int playerRealWidth = ObjectSizeManager.getInstance().getPlayerWidth();
+        if(x+playerRealWidth<platform.x || x>platform.x+platform.length){
             return true;
         }
         else {
@@ -251,9 +293,10 @@ public class Player extends Entity implements IUpdate {
     }
 
     public boolean isCollisionWithPlatform(Platform platform){
+
         if(vy<=0){
-            if(x+frameW>platform.x && x<platform.x+platform.length){
-                if(Math.abs(y+playerRealHeight - platform.y)<10){
+            if(x+playerWidthOnScreen>platform.x && x<platform.x+platform.length){
+                if(Math.abs(y+playerHeightOnScreen - platform.y)<10){
                     return true;
                 }
                 else {

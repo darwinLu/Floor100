@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import com.example.lx.floor100.engine.ObjectSizeManager;
 import com.example.lx.floor100.view.MySurfaceView;
 
 /**
@@ -25,7 +26,7 @@ public class Rank {
     public void draw(Canvas canvas, Paint paint){
         paint.setColor(Color.RED);
         paint.setTextSize(80);
-        canvas.drawText("rank:"+currentRank, MySurfaceView.screenW-400,100,paint);
+        canvas.drawText("rank:"+currentRank, ObjectSizeManager.getInstance().getScreenW()-400,100,paint);
     }
 
     public void addRank(){

@@ -5,8 +5,6 @@ package com.example.lx.floor100.engine;
  */
 
 public class Entity{
-
     public int y;
-    public boolean doGravityFlag = true;
-
+    public boolean doGravityFlag;
 }
