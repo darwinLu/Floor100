@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 
 import com.example.lx.floor100.engine.ObjectSizeManager;
-import com.example.lx.floor100.view.MySurfaceView;
 
 /**
  * Created by lx on 2018-08-10.
@@ -15,7 +14,7 @@ public class Rank {
 
     private int currentRank;
 
-    private int level = 2;
+    private int level = 1;
 
     private int rankFrame = 0;
 
@@ -24,9 +23,9 @@ public class Rank {
     }
 
     public void draw(Canvas canvas, Paint paint){
-        paint.setColor(Color.RED);
-        paint.setTextSize(80);
-        canvas.drawText("rank:"+currentRank, ObjectSizeManager.getInstance().getScreenW()-400,100,paint);
+        paint.setColor(Color.GREEN);
+        paint.setTextSize(60);
+        canvas.drawText("层数:"+currentRank, ObjectSizeManager.getInstance().getScreenW()-400,90,paint);
     }
 
     public void addRank(){

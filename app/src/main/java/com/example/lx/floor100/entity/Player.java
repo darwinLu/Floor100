@@ -3,25 +3,21 @@ package com.example.lx.floor100.entity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.drawable.ScaleDrawable;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.example.lx.floor100.R;
-import com.example.lx.floor100.engine.Entity;
 import com.example.lx.floor100.engine.IUpdate;
 import com.example.lx.floor100.engine.ObjectSizeManager;
-import com.example.lx.floor100.view.MySurfaceView;
+import com.example.lx.floor100.view.GameSurfaceView;
 
 /**
  * Created by lx on 2017-05-31.
  */
 
-public class Player extends Entity implements IUpdate {
+public class Player implements IUpdate {
 
     //帧动画总数，用来切分帧动画图
     private int frameCount = 11;
@@ -32,10 +28,10 @@ public class Player extends Entity implements IUpdate {
     public int frameH;
 
     //主角的实际图像距离帧图各边的边距
-    private int leftPadding = 5;
-    private int rightPadding = 5;
-    private int topPadding = 1;
-    private int bottomPadding = 20;
+    private int leftPadding = 10;
+    private int rightPadding = 10;
+    private int topPadding = 30;
+    private int bottomPadding = 70;
 
     //主角实时位置，代表主角的实际有效图形的左上角位置
     public int x;
@@ -99,7 +95,7 @@ public class Player extends Entity implements IUpdate {
         countPlayerHeightOnScreen();
         //platformThickness = ObjectSizeManager.getInstance().getPlatformThickness();
         this.x = 0;
-        this.y = gameView.getHeight() - ObjectSizeManager.getInstance().getPlayerHeight() - ObjectSizeManager.getInstance().getFloorHeight();
+        this.y = ObjectSizeManager.getInstance().getScreenH() - ObjectSizeManager.getInstance().getPlayerHeight() - ObjectSizeManager.getInstance().getFloorHeight();
         isMoving = true;
     }
 
@@ -107,8 +103,8 @@ public class Player extends Entity implements IUpdate {
         frameW = bmpPlayer.getWidth()/frameCount;
         frameH = bmpPlayer.getHeight();
         int playerBitmapWidth = frameW - leftPadding - rightPadding;
-        scaleFactor = (((float)ObjectSizeManager.getInstance().getPlayerWidth()))/(float)playerBitmapWidth;
-        playerHeightOnScreen = (int)((float)bmpPlayer.getHeight()*scaleFactor);
+        scaleFactor = (((float)ObjectSizeManager.getInstance().getPlayerWidth()+leftPadding+rightPadding))/(float)playerBitmapWidth;
+        playerHeightOnScreen = (int)((float)(bmpPlayer.getHeight() - topPadding - bottomPadding)*scaleFactor);
         ObjectSizeManager.getInstance().setPlayerHeight(playerHeightOnScreen);
 //
 //        Matrix matrix = new Matrix();
@@ -139,7 +135,7 @@ public class Player extends Entity implements IUpdate {
 
     //此函数在每次主循环中执行一次
     @Override
-    public void update(MySurfaceView view) {
+    public void update(GameSurfaceView view) {
         changeFrame();
         if(isMoving){
             move(view);
@@ -176,7 +172,7 @@ public class Player extends Entity implements IUpdate {
 
     }
 
-    public void move(MySurfaceView view){
+    public void move(GameSurfaceView view){
         //无论何种情况，水平方向都一直左右移动
         int playerRealWidth = ObjectSizeManager.getInstance().getPlayerWidth();
         if(direction == DIRCTION_RIGHT){
@@ -195,12 +191,12 @@ public class Player extends Entity implements IUpdate {
         }
     }
 
-    public void jump(MySurfaceView view) {
-        double next_vy = vy + MySurfaceView.DELTA_TIME * g / 1000;
+    public void jump(GameSurfaceView view) {
+        double next_vy = vy + GameSurfaceView.DELTA_TIME * g / 1000;
         int deltaY;
         if(vy > 0 && next_vy > 0) {
             vy = next_vy;
-            deltaY = (int)((ObjectSizeManager.getInstance().getScreenH()/100)*((vy * MySurfaceView.DELTA_TIME / 1000 + (g/2)*MySurfaceView.DELTA_TIME*MySurfaceView.DELTA_TIME/1000/1000)));
+            deltaY = (int)((ObjectSizeManager.getInstance().getScreenH()/100)*((vy * GameSurfaceView.DELTA_TIME / 1000 + (g/2)* GameSurfaceView.DELTA_TIME* GameSurfaceView.DELTA_TIME/1000/1000)));
             if((y - deltaY) <ObjectSizeManager.getInstance().getScreenH()/3){
                 view.isRollingBackground = true;
                 view.rollingDistance = deltaY;
@@ -216,13 +212,13 @@ public class Player extends Entity implements IUpdate {
             view.rollingDistance = 0;
 //            isRising = false;
 //            isFalling = true;
-            deltaY = (int)((ObjectSizeManager.getInstance().getScreenH()/100)*((vy * MySurfaceView.DELTA_TIME / 1000 + (g/2)*MySurfaceView.DELTA_TIME*MySurfaceView.DELTA_TIME/1000/1000)));
+            deltaY = (int)((ObjectSizeManager.getInstance().getScreenH()/100)*((vy * GameSurfaceView.DELTA_TIME / 1000 + (g/2)* GameSurfaceView.DELTA_TIME* GameSurfaceView.DELTA_TIME/1000/1000)));
             y = y - deltaY;
             return;
         }
         if(vy<=0){
             vy = next_vy;
-            deltaY = (int)((ObjectSizeManager.getInstance().getScreenH()/100)*((vy * MySurfaceView.DELTA_TIME / 1000 + (g/2)*MySurfaceView.DELTA_TIME*MySurfaceView.DELTA_TIME/1000/1000)));
+            deltaY = (int)((ObjectSizeManager.getInstance().getScreenH()/100)*((vy * GameSurfaceView.DELTA_TIME / 1000 + (g/2)* GameSurfaceView.DELTA_TIME* GameSurfaceView.DELTA_TIME/1000/1000)));
             y = y - deltaY;
         }
 //        if(y>MySurfaceView.screenH - frameH){
@@ -285,6 +281,8 @@ public class Player extends Entity implements IUpdate {
     public boolean isOutOfPlatform(){
         int playerRealWidth = ObjectSizeManager.getInstance().getPlayerWidth();
         if(x+playerRealWidth<platform.x || x>platform.x+platform.length){
+            Log.d("looping","now i am true too ,x:"+x+";playerRealWidth:"+playerRealWidth+";platformX:"
+            +platform.x+";platformLength:"+platform.length);
             return true;
         }
         else {
@@ -297,6 +295,7 @@ public class Player extends Entity implements IUpdate {
         if(vy<=0){
             if(x+playerWidthOnScreen>platform.x && x<platform.x+platform.length){
                 if(Math.abs(y+playerHeightOnScreen - platform.y)<10){
+                    Log.d("looping","now i am true");
                     return true;
                 }
                 else {
@@ -327,7 +326,7 @@ public class Player extends Entity implements IUpdate {
 //        }
     }
 
-    public boolean onTouchEvent(MotionEvent event,MySurfaceView view) {
+    public boolean onTouchEvent(MotionEvent event, GameSurfaceView view) {
         if(event.getAction()==MotionEvent.ACTION_DOWN){
 //            if(platform.getClass() == SpringPlatform.class){
 //                //vy = 100;

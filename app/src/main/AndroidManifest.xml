@@ -12,10 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:theme="@style/FullScreen" />
         <activity
-            android:name=".StartActivity"
+            android:name=".activity.StartActivity"
             android:launchMode="singleTask"
             android:theme="@style/FullScreen">
             <intent-filter>
@@ -25,12 +25,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RankActivity"
+            android:name=".activity.RankActivity"
             android:theme="@style/FullScreen" />
         <activity
-            android:name=".OptionActivity"
+            android:name=".activity.OptionActivity"
             android:theme="@style/FullScreen" />
-        <activity android:name=".TestActivity"></activity>
     </application>
 
 </manifest>

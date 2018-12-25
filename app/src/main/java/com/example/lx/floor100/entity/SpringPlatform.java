@@ -2,14 +2,12 @@ package com.example.lx.floor100.entity;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.util.Log;
-import android.view.View;
 
 import com.example.lx.floor100.engine.ObjectSizeManager;
-import com.example.lx.floor100.view.MySurfaceView;
+import com.example.lx.floor100.view.GameSurfaceView;
 
 import java.util.Random;
 
@@ -111,7 +109,7 @@ public class SpringPlatform extends Platform {
     }
 
     @Override
-    public void update(MySurfaceView view) {
+    public void update(GameSurfaceView view) {
         super.update(view);
         if(playerFirstTouchSpring){
             this.y += compressDiffWithNormal;
@@ -146,7 +144,7 @@ public class SpringPlatform extends Platform {
 
 
     @Override
-    public void addEffectToPlayer(MySurfaceView view) {
+    public void addEffectToPlayer(GameSurfaceView view) {
         super.addEffectToPlayer(view);
     }
 

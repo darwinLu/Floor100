@@ -1,12 +1,8 @@
 package com.example.lx.floor100.entity;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.view.View;
 
-import com.example.lx.floor100.view.MySurfaceView;
+import com.example.lx.floor100.view.GameSurfaceView;
 
 /**
  * Created by lx on 2018-08-08.
@@ -37,7 +33,7 @@ public class LRPlatform extends Platform {
 //    }
 
     @Override
-    public void update(MySurfaceView view) {
+    public void update(GameSurfaceView view) {
         if(direction == DIRCTION_RIGHT){
             x = x + 1;
             if(x > init_x + 80){
@@ -56,7 +52,7 @@ public class LRPlatform extends Platform {
     }
 
     @Override
-    public void addEffectToPlayer(MySurfaceView view) {
+    public void addEffectToPlayer(GameSurfaceView view) {
         if(direction == DIRCTION_RIGHT){
                 view.player.addX(1);
         }

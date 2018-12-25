@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/sky_cloud"
     android:orientation="vertical"
-    tools:context="com.example.lx.floor100.RankActivity">
+    tools:context="com.example.lx.floor100.activity.RankActivity">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="30pt"

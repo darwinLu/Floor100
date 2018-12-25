@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:background="@drawable/sky_cloud"
-    tools:context="com.example.lx.floor100.OptionActivity">
+    tools:context="com.example.lx.floor100.activity.OptionActivity">
 
     <TextView
         android:layout_width="wrap_content"

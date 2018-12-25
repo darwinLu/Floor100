@@ -1,6 +1,6 @@
 package com.example.lx.floor100.engine;
 
-import com.example.lx.floor100.view.MySurfaceView;
+import com.example.lx.floor100.view.GameSurfaceView;
 
 /**
  * Created by lx on 2018-07-02.
@@ -9,5 +9,5 @@ import com.example.lx.floor100.view.MySurfaceView;
 
 public interface IUpdate {
 
-    void update(MySurfaceView view);
+    void update(GameSurfaceView view);
 }

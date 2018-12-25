@@ -2,15 +2,12 @@ package com.example.lx.floor100.entity;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.view.View;
 
-import com.example.lx.floor100.engine.Entity;
 import com.example.lx.floor100.engine.IUpdate;
 import com.example.lx.floor100.engine.ObjectSizeManager;
-import com.example.lx.floor100.view.MySurfaceView;
+import com.example.lx.floor100.view.GameSurfaceView;
 
 import java.util.Random;
 
@@ -18,10 +15,11 @@ import java.util.Random;
  * Created by lx on 2017-06-19.
  */
 
-public class Platform extends Entity implements IUpdate {
+public class Platform implements IUpdate {
 
     //平台显示位置左上角坐标
-    public int x,y;
+    public int x;
+    public int y;
     //平台实际显示宽度和高度
     private int platformWidthOnScreen;
     private int platformHeightOnScreen;
@@ -38,6 +36,8 @@ public class Platform extends Entity implements IUpdate {
 
     //随机数,随机产生平台对屏幕的偏移
     private Random rand = new Random();
+
+    public Platform(){}
 
     public Platform(int existPlatformNumber,Bitmap bmpPlatform){
         this.bmpPlatform = bmpPlatform;
@@ -74,13 +74,13 @@ public class Platform extends Entity implements IUpdate {
 
 
     @Override
-    public void update(MySurfaceView view) {
+    public void update(GameSurfaceView view) {
         if(y>ObjectSizeManager.getInstance().getScreenH()){
             isOnScreen = false;
         }
     }
 
-    public void addEffectToPlayer(MySurfaceView view){
+    public void addEffectToPlayer(GameSurfaceView view){
         return;
     }
 }

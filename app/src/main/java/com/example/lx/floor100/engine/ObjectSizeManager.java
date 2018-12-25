@@ -26,7 +26,6 @@ public class ObjectSizeManager {
     private int platformSpace;
     private int backgroundWidth;
     private int backgroundHeight;
-    private int floorWidth;
     private int floorHeight;
 
     public int getScreenH() {
@@ -101,14 +100,6 @@ public class ObjectSizeManager {
         this.backgroundHeight = backgroundHeight;
     }
 
-    public int getFloorWidth() {
-        return floorWidth;
-    }
-
-    public void setFloorWidth(int floorWidth) {
-        this.floorWidth = floorWidth;
-    }
-
     public int getFloorHeight() {
         return floorHeight;
     }
@@ -124,6 +115,5 @@ public class ObjectSizeManager {
         this.setPlatformThickness(screenH/20);
         this.setPlatformSpace(screenH/10);
         this.setBackgroundWidth(screenW);
-        this.setFloorWidth(screenW);
     }
 }

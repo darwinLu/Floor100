@@ -6,8 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
-import com.example.lx.floor100.R;
-import com.example.lx.floor100.view.MySurfaceView;
+import com.example.lx.floor100.view.GameSurfaceView;
 
 /**
  * Created by lx on 2018-08-09.
@@ -31,12 +30,18 @@ public class Progress {
 
     private int powerSoundStream;
 
+    private int x;
+    private int y;
+
     public Progress(int max, int current, int length, int height,int column) {
+
         this.max = max;
         this.current = current;
         this.length = length;
         this.height = height;
         this.column = column;
+        this.x = 30;
+        this.y = 30;
     }
 
     public void increaseValue(){
@@ -65,15 +70,15 @@ public class Progress {
     }
 
     public void draw(Canvas canvas, Paint paint){
-        paint.setColor(Color.WHITE);
-        canvas.drawRect(0,0,length,height,paint);
+        paint.setColor(Color.YELLOW);
+        canvas.drawRect(x,y,x+length,y+height,paint);
         paint.setColor(Color.BLUE);
         for(int i=0;i<current;i++){
-            canvas.drawRect(i*(length/column),0,(i+1)*(length/column),height,paint);
+            canvas.drawRect(x+i*(length/column),y,x+(i+1)*(length/column),y+height,paint);
         }
     }
 
-    public boolean onTouchEvent(MotionEvent event,MySurfaceView view) {
+    public boolean onTouchEvent(MotionEvent event, GameSurfaceView view) {
         if(event.getAction()==MotionEvent.ACTION_DOWN){
             if(view.getContext().getSharedPreferences("option", Context.MODE_PRIVATE)
                     .getString("sound_switch","off").equals("on")){

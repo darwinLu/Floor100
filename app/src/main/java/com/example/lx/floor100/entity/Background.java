@@ -6,7 +6,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 
 import com.example.lx.floor100.engine.ObjectSizeManager;
-import com.example.lx.floor100.view.MySurfaceView;
 
 /**
  * Created by lx on 2018-08-06.

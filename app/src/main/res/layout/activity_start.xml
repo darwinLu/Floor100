@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:background="@drawable/sky_cloud"
-    tools:context="com.example.lx.floor100.StartActivity">
+    tools:context="com.example.lx.floor100.activity.StartActivity">
     <ImageView
         android:id="@+id/title_image"
         android:layout_width="match_parent"
@@ -52,11 +52,4 @@
         android:layout_marginBottom="10dp"
         android:text="退出" />
 
-    <Button
-        android:id="@+id/test_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button_image"
-        android:layout_marginBottom="10dp"
-        android:text="测试页" />
 </LinearLayout>

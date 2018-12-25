@@ -5,10 +5,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.view.View;
+import android.util.Log;
 
 import com.example.lx.floor100.engine.ObjectSizeManager;
-import com.example.lx.floor100.view.MySurfaceView;
+import com.example.lx.floor100.view.GameSurfaceView;
 
 /**
  * Created by lx on 2018-08-10.
@@ -18,46 +18,52 @@ public class FloorPlatform extends Platform {
 
     private int floorWidthOnScreen;
     private Bitmap bmpFloorPlatformOnScreen;
+    private Bitmap bmpFLoorPlatform;
     int x,y;
 
     public FloorPlatform(int existPlatformNumber,Bitmap bmpPlatform){
-        super(existPlatformNumber,bmpPlatform);
+        //super(existPlatformNumber,bmpPlatform);
         //super.bmpPlatform = bmpPlatform;
+        this.bmpFLoorPlatform = bmpPlatform;
         calculateObjectSizeOnScreen();
-        this.x = 0;
-        this.y = ObjectSizeManager.getInstance().getScreenH() - ObjectSizeManager.getInstance().getFloorHeight();
-        super.length = ObjectSizeManager.getInstance().getFloorWidth();
+        super.x = 0;
+        super.y = ObjectSizeManager.getInstance().getScreenH() - ObjectSizeManager.getInstance().getFloorHeight();
+        super.length = ObjectSizeManager.getInstance().getScreenW();
         scaleFloorPlatformBitmap();
+        isOnScreen = true;
     }
 
     private void scaleFloorPlatformBitmap() {
         Matrix matrix = new Matrix();
         matrix.postScale(scaleFactor,scaleFactor);
-        bmpFloorPlatformOnScreen = Bitmap.createBitmap(bmpPlatform,
-                0,0,bmpPlatform.getWidth(),
-                bmpPlatform.getHeight(),
+        bmpFloorPlatformOnScreen = Bitmap.createBitmap(bmpFLoorPlatform,
+                0,0,bmpFLoorPlatform.getWidth(),
+                bmpFLoorPlatform.getHeight(),
                 matrix,false);
     }
 
     private void calculateObjectSizeOnScreen() {
-        scaleFactor = (float) ObjectSizeManager.getInstance().getScreenW()/(float)bmpPlatform.getWidth();
-        ObjectSizeManager.getInstance().setFloorHeight((int)((float)bmpPlatform.getHeight()*scaleFactor));
+        scaleFactor = (float) ObjectSizeManager.getInstance().getScreenW()/(float)bmpFLoorPlatform.getWidth();
+        ObjectSizeManager.getInstance().setFloorHeight((int)((float)bmpFLoorPlatform.getHeight()*scaleFactor));
     }
 
     @Override
     public void platformDraw(Canvas canvas,Paint paint) {
         if(isOnScreen) {
-            canvas.drawBitmap(bmpFloorPlatformOnScreen,x,y,paint);
+            paint.setColor(Color.RED);
+            //Log.d("looping","floor platfrom,x"+this.x+";y"+this.y);
+            //canvas.drawRect(super.x,super.y,super.x+bmpFloorPlatformOnScreen.getWidth(),super.y+bmpFloorPlatformOnScreen.getHeight(),paint);
+            canvas.drawBitmap(bmpFloorPlatformOnScreen,super.x,super.y,paint);
         }
     }
 
     @Override
-    public void update(MySurfaceView view) {
+    public void update(GameSurfaceView view) {
         super.update(view);
     }
 
     @Override
-    public void addEffectToPlayer(MySurfaceView view) {
+    public void addEffectToPlayer(GameSurfaceView view) {
         super.addEffectToPlayer(view);
     }
 }
