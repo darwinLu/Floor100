@@ -6,6 +6,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.util.Log;
 
+import com.example.lx.floor100.engine.IUpdate;
 import com.example.lx.floor100.engine.ObjectSizeManager;
 import com.example.lx.floor100.view.GameSurfaceView;
 
@@ -15,7 +16,7 @@ import java.util.Random;
  * Created by lx on 2018-08-08.
  */
 
-public class SpringPlatform extends Platform {
+public class SpringPlatform extends AbstractPlatform implements IUpdate {
 
     private Bitmap bmpSpringPlatformCompress;
     private Bitmap bmpSpringPlatformUncompress;
@@ -29,14 +30,9 @@ public class SpringPlatform extends Platform {
 
     private int spring_status = SPRING_STATUS_NORMAL;
 
-    public Boolean playSpringAnimation = false;
+    public boolean playSpringAnimation = false;
 
     private int currentFrame = 0;
-
-    private int i=0;
-
-    private int springPlatformWidthOnScreen;
-    private int springPlatformHeightOnScreen;
 
     private int compressDiffWithNormal;
     private int uncompressDiffWithNormal;
@@ -44,46 +40,51 @@ public class SpringPlatform extends Platform {
     //随机数,随机产生平台对屏幕的偏移
     private Random rand = new Random();
 
-//    public SpringPlatform(int platform_x, int platform_y, int length, Bitmap bmpPlatform,Bitmap bmpSpringPlatformCompress,Bitmap bmpSpringPlatformUncompress,View gameView) {
-//        super(platform_x, platform_y, length, bmpPlatform,gameView);
-//        this.bmpSpringPlatformCompress = bmpSpringPlatformCompress;
-//        this.bmpSpringPlatformUncompress = bmpSpringPlatformUncompress;
-//        this.bmpSpringPlatformNormal = bmpPlatform;
-//    }
-
     public SpringPlatform(int existPlatformNumber, Bitmap bmpPlatform,Bitmap bmpSpringPlatformCompress,Bitmap bmpSpringPlatformUncompress) {
-        super(existPlatformNumber, bmpPlatform);
         this.bmpSpringPlatformCompress = bmpSpringPlatformCompress;
         this.bmpSpringPlatformUncompress = bmpSpringPlatformUncompress;
         this.bmpSpringPlatformNormal = bmpPlatform;
-        countSpringPlatformWidthOnScreen();
-        countCompressAndUncompress();
+        calculateObjectSizeOnScreen();
+        countCompressAndUncompressDiff();
         this.x = -ObjectSizeManager.getInstance().getPlatformWidth()/2 + ObjectSizeManager.getInstance().getScreenW()/10*rand.nextInt(10);
         this.y = ObjectSizeManager.getInstance().getScreenH() - (existPlatformNumber)*(ObjectSizeManager.getInstance().getPlatformSpace()+ObjectSizeManager.getInstance().getPlatformThickness());
-        this.length = ObjectSizeManager.getInstance().getPlatformWidth();
+        isOnScreen = true;
     }
 
-    private void countCompressAndUncompress() {
+    private void countCompressAndUncompressDiff() {
         compressDiffWithNormal = (int)((bmpSpringPlatformNormal.getHeight() - bmpSpringPlatformCompress.getHeight())*scaleFactor);
         uncompressDiffWithNormal =(int)((bmpSpringPlatformUncompress.getHeight() - bmpSpringPlatformNormal.getHeight())*scaleFactor);
     }
 
-    private void countSpringPlatformWidthOnScreen() {
-        scaleFactor = (((float) ObjectSizeManager.getInstance().getPlatformThickness()))/(float)bmpSpringPlatformNormal.getHeight();
-        springPlatformWidthOnScreen = (int)((float)bmpSpringPlatformNormal.getWidth()*scaleFactor);
-        ObjectSizeManager.getInstance().setPlatformWidth(springPlatformWidthOnScreen);
-        springPlatformHeightOnScreen = ObjectSizeManager.getInstance().getPlatformThickness();
+    private void calculateObjectSizeOnScreen() {
+        originWidth = bmpSpringPlatformNormal.getWidth();
+        originHeight = bmpSpringPlatformNormal.getHeight();
+        onScreenHeight = ObjectSizeManager.getInstance().getPlatformThickness();
+        scaleFactor = ((onScreenHeight))/(float)bmpSpringPlatformNormal.getHeight();
+        onScreenWidth = (int)((float)bmpSpringPlatformNormal.getWidth()*scaleFactor);
+        ObjectSizeManager.getInstance().setPlatformWidth(onScreenWidth);
     }
 
     @Override
-    public void platformDraw(Canvas canvas,Paint paint) {
-//        Paint paint = new Paint();
-//        paint.setColor(Color.BLUE);
+    public void update(GameSurfaceView view) {
+        if(playerFirstTouchSpring){
+            this.y += compressDiffWithNormal;
+            view.player.addY(compressDiffWithNormal);
+            spring_status = SPRING_STATUS_COMPRESS;
+            playerFirstTouchSpring = false;
+        }
+        if(playSpringAnimation){
+            changeSpringPerFrame();
+        }
+    }
+
+    @Override
+    public void draw(Canvas canvas,Paint paint) {
         Matrix matrix = new Matrix();
         matrix.postScale(scaleFactor,scaleFactor);
-        Bitmap springPlatformNormalBitmap = Bitmap.createBitmap(bmpPlatform,
+        Bitmap springPlatformNormalBitmap = Bitmap.createBitmap(bmpSpringPlatformNormal,
                 0,0,
-                bmpPlatform.getWidth(),bmpPlatform.getHeight(),
+                bmpSpringPlatformNormal.getWidth(),bmpSpringPlatformNormal.getHeight(),
                 matrix,false);
         Bitmap springPlatformCompressBitmap = Bitmap.createBitmap(bmpSpringPlatformCompress,
                 0,0,
@@ -93,7 +94,6 @@ public class SpringPlatform extends Platform {
                 0,0,
                 bmpSpringPlatformUncompress.getWidth(),bmpSpringPlatformUncompress.getHeight(),
                 matrix,false);
-        Log.d("rolling","x:"+x+";y:"+y+";");
         if(isOnScreen) {
             if(spring_status == SPRING_STATUS_NORMAL){
                 canvas.drawBitmap(springPlatformNormalBitmap,x,y,paint);
@@ -104,21 +104,6 @@ public class SpringPlatform extends Platform {
             else if(spring_status == SPRING_STATUS_UNCOMPRESS){
                 canvas.drawBitmap(springPlatformUncompressBitmap,x,y,paint);
             }
-            //canvas.drawRect(x, y, x + length, y + THICKNESS, paint);
-        }
-    }
-
-    @Override
-    public void update(GameSurfaceView view) {
-        super.update(view);
-        if(playerFirstTouchSpring){
-            this.y += compressDiffWithNormal;
-            view.player.addY(compressDiffWithNormal);
-            spring_status = SPRING_STATUS_COMPRESS;
-            playerFirstTouchSpring = false;
-        }
-        if(playSpringAnimation){
-            changeSpringPerFrame();
         }
     }
 
@@ -142,10 +127,9 @@ public class SpringPlatform extends Platform {
         }
     }
 
-
     @Override
     public void addEffectToPlayer(GameSurfaceView view) {
-        super.addEffectToPlayer(view);
+        return;
     }
 
 

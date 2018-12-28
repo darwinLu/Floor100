@@ -28,6 +28,7 @@ import com.example.lx.floor100.activity.MainActivity;
 import com.example.lx.floor100.activity.RankActivity;
 import com.example.lx.floor100.engine.IUpdate;
 import com.example.lx.floor100.engine.ObjectSizeManager;
+import com.example.lx.floor100.entity.AbstractPlatform;
 import com.example.lx.floor100.hud.Progress;
 import com.example.lx.floor100.R;
 import com.example.lx.floor100.hud.Rank;
@@ -80,8 +81,8 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     //游戏对象
     private Background background;
     public Player player;
-    private Platform floor;
-    private LinkedList<Platform> platformList = new LinkedList<>();
+    private FloorPlatform floor;
+    private LinkedList<AbstractPlatform> platformList = new LinkedList<>();
     private int platformNumber;
     //HUD
     public Progress progress;
@@ -292,7 +293,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         //添加主角到更新列表
         updateObjects.add(player);
         //设置主角初始所在的平台
-        player.platform = floor;
+        player.abstractPlatform = floor;
         //设置力量条
         progress = new Progress(10,0,500,30,10);
         //设置积分牌
@@ -307,10 +308,10 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
             if (canvas != null) {
                 canvas.drawColor(Color.BLACK);
                 background.draw(canvas,paint);
-                for(Iterator<Platform> platformIterator = platformList.iterator();platformIterator.hasNext();){
-                    platformIterator.next().platformDraw(canvas,paint);
+                for(Iterator<AbstractPlatform> platformIterator = platformList.iterator();platformIterator.hasNext();){
+                    platformIterator.next().draw(canvas,paint);
                 }
-                player.playerDraw(canvas,paint);
+                player.draw(canvas,paint);
                 progress.draw(canvas,paint);
                 rank.draw(canvas,paint);
             }
@@ -350,7 +351,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
             platformList.remove();
             rank.addRank();
             int typeNumber = rand.nextInt(10);
-            Platform newPlatform;
+            AbstractPlatform newPlatform;
             if(typeNumber>7){
                 newPlatform = new Platform(platformList.size()+1,bmpPlatform);
             }
@@ -381,11 +382,11 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         else {
             //使用光线投射法检测碰撞
             for(int i=0;i<platformList.size();i++){
-                if(player.isCollisionWithPlatform((Platform)platformList.get(i))){
-                    player.y = ((Platform) platformList.get(i)).y - objectSizeManager.getPlayerHeight();
+                if(player.isCollisionWithPlatform((AbstractPlatform)platformList.get(i))){
+                    player.y = ((AbstractPlatform) platformList.get(i)).y - objectSizeManager.getPlayerHeight();
                     player.isJumping = false;
                     player.isOnPlatform = true;
-                    player.platform = (Platform)platformList.get(i);
+                    player.abstractPlatform = (AbstractPlatform)platformList.get(i);
                     //如果是弹簧踏板，特殊处理
                     if(platformList.get(i).getClass()==SpringPlatform.class){
                         ((SpringPlatform)platformList.get(i)).playerFirstTouchSpring= true;

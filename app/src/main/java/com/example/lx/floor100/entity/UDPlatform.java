@@ -19,25 +19,10 @@ public class UDPlatform extends Platform {
     private int moveDistance = 30;
     private int frameDistance;
 
-//    public UDPlatform(int platform_x, int platform_y, int length, Bitmap bmpPlatform,View gameView) {
-//        super(platform_x, platform_y, length, bmpPlatform,gameView);
-//        init_y = platform_y;
-//    }
-
     public UDPlatform(int existPlatformNumber, Bitmap bmpPlatform) {
         super(existPlatformNumber, bmpPlatform);
         init_y = super.y;
     }
-
-//    @Override
-//    public void platformDraw(Canvas canvas,Paint paint) {
-////        Paint paint = new Paint();
-////        paint.setColor(Color.RED);
-//        if(isOnScreen) {
-//            canvas.drawBitmap(bmpPlatform,x,y,paint);
-//            //canvas.drawRect(x, y, x + length, y + THICKNESS, paint);
-//        }
-//    }
 
     @Override
     public void update(GameSurfaceView view) {

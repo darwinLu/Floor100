@@ -5,10 +5,12 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.example.lx.floor100.engine.Enity;
 import com.example.lx.floor100.engine.IUpdate;
 import com.example.lx.floor100.engine.ObjectSizeManager;
 import com.example.lx.floor100.view.GameSurfaceView;
@@ -17,7 +19,7 @@ import com.example.lx.floor100.view.GameSurfaceView;
  * Created by lx on 2017-05-31.
  */
 
-public class Player implements IUpdate {
+public class Player extends Enity implements IUpdate {
 
     //帧动画总数，用来切分帧动画图
     private int frameCount = 11;
@@ -34,11 +36,11 @@ public class Player implements IUpdate {
     private int bottomPadding = 70;
 
     //主角实时位置，代表主角的实际有效图形的左上角位置
-    public int x;
-    public int y;
+    //public int x;
+    //public int y;
     //主角的实际宽度和高度，代表有效的碰撞体积，可以用帧图宽高减去各方向间距
-    private int playerWidthOnScreen;
-    private int playerHeightOnScreen;
+    //private int playerWidthOnScreen;
+    //private int playerHeightOnScreen;
 
     //水平方向移动初速度，每次主循环的移动增量
     private int moveSpeed = 5;
@@ -63,7 +65,7 @@ public class Player implements IUpdate {
     public boolean isJumping;
 
     //当前主角所在的platform
-    public Platform platform;
+    public AbstractPlatform abstractPlatform;
     //是否处于平台的标志位
     public boolean isOnPlatform = false;
 
@@ -78,77 +80,42 @@ public class Player implements IUpdate {
     //控制角色帧图在第几行循环
     private int indexLine;
 
-    //缩放系数
-    private float scaleFactor;
-
-
     //构造函数
     public Player(Bitmap bmpPlayer,Bitmap bmpPlayerJump,View gameView){
         this.bmpPlayerJump = bmpPlayerJump;
         this.bmpPlayer = bmpPlayer;
-        //frameW = bmpPlayer.getWidth()/frameCount;
-        //frameH = bmpPlayer.getHeight();
-        //playerRealWidth = frameW - leftPadding - rightPadding;
-        //playerRealHeight = frameH - topPadding  - bottomPadding;
-        //scaleBitmap(playerRealWidth,playerRealHeight,gameView);
-        playerWidthOnScreen = ObjectSizeManager.getInstance().getPlayerWidth();
-        countPlayerHeightOnScreen();
-        //platformThickness = ObjectSizeManager.getInstance().getPlatformThickness();
+        calculateObjectSizeOnScreen();
         this.x = 0;
         this.y = ObjectSizeManager.getInstance().getScreenH() - ObjectSizeManager.getInstance().getPlayerHeight() - ObjectSizeManager.getInstance().getFloorHeight();
+        isOnScreen = true;
         isMoving = true;
     }
 
-    private void countPlayerHeightOnScreen() {
+    private void calculateObjectSizeOnScreen() {
         frameW = bmpPlayer.getWidth()/frameCount;
         frameH = bmpPlayer.getHeight();
         int playerBitmapWidth = frameW - leftPadding - rightPadding;
+        onScreenWidth = ObjectSizeManager.getInstance().getPlayerWidth();
         scaleFactor = (((float)ObjectSizeManager.getInstance().getPlayerWidth()+leftPadding+rightPadding))/(float)playerBitmapWidth;
-        playerHeightOnScreen = (int)((float)(bmpPlayer.getHeight() - topPadding - bottomPadding)*scaleFactor);
-        ObjectSizeManager.getInstance().setPlayerHeight(playerHeightOnScreen);
-//
-//        Matrix matrix = new Matrix();
-//        matrix.postScale(scaleFactor,scaleFactor);
-//        bmpPlayer = Bitmap.createBitmap(bmpPlayer,0,0,bmpPlayer.getWidth(),bmpPlayer.getHeight(),matrix,false);
-//        bmpPlayerJump = Bitmap.createBitmap(bmpPlayerJump,0,0,bmpPlayerJump.getWidth(),bmpPlayerJump.getHeight(),matrix,false);
-//        frameW = bmpPlayer.getWidth();
-//        frameH = bmpPlayer.getHeight();
+        onScreenHeight = (int)((float)(bmpPlayer.getHeight() - topPadding - bottomPadding)*scaleFactor);
+        ObjectSizeManager.getInstance().setPlayerHeight(onScreenHeight);
     }
-
-
-
-//    private void scaleBitmap(int playerRealWidthOrigin,int playerRealHeightOrigin,View gameView) {
-//        float scalePlayerWidth = (((float)gameView.getWidth())/8)/(float)playerRealWidthOrigin;
-//        Matrix matrix = new Matrix();
-//        matrix.postScale(scalePlayerWidth,scalePlayerWidth);
-//        bmpPlayer = Bitmap.createBitmap(bmpPlayer,0,0,bmpPlayer.getWidth(),bmpPlayer.getHeight(),matrix,false);
-//        bmpPlayerJump = Bitmap.createBitmap(bmpPlayerJump,0,0,bmpPlayerJump.getWidth(),bmpPlayerJump.getHeight(),matrix,false);
-//        frameW = bmpPlayer.getWidth()/frameCount;
-//        frameH = bmpPlayer.getHeight();
-//        leftPadding = (int)((float)leftPadding * scalePlayerWidth);
-//        rightPadding = (int)((float)rightPadding * scalePlayerWidth);
-//        topPadding = (int)((float)topPadding * scalePlayerWidth);
-//        bottomPadding = (int)((float)bottomPadding * scalePlayerWidth);
-//        //playerRealWidth = frameW - leftPadding - rightPadding;
-//        playerRealHeight = frameH - topPadding  - bottomPadding;
-//    }
 
     //此函数在每次主循环中执行一次
     @Override
     public void update(GameSurfaceView view) {
         changeFrame();
         if(isMoving){
-            move(view);
+            move();
         }
         if(isJumping){
             jump(view);
         }
         if(!isJumping){
             if(!isOutOfPlatform()){
-                platform.addEffectToPlayer(view);
+                abstractPlatform.addEffectToPlayer(view);
             }
         }
-//        checkIfOnPlatform();
     }
 
     private void changeFrame() {
@@ -169,16 +136,14 @@ public class Player implements IUpdate {
                 changeFrameCount = 0;
             }
         }
-
     }
 
-    public void move(GameSurfaceView view){
+    public void move(){
         //无论何种情况，水平方向都一直左右移动
-        int playerRealWidth = ObjectSizeManager.getInstance().getPlayerWidth();
         if(direction == DIRCTION_RIGHT){
             x = x + moveSpeed;
-            if(x + playerRealWidth > ObjectSizeManager.getInstance().getScreenW()){
-                x = ObjectSizeManager.getInstance().getScreenW() - playerRealWidth;
+            if(x + onScreenWidth > ObjectSizeManager.getInstance().getScreenW()){
+                x = ObjectSizeManager.getInstance().getScreenW() - onScreenWidth;
                 direction = DIRCTION_LEFT;
             }
         }
@@ -210,8 +175,6 @@ public class Player implements IUpdate {
             vy = 0;
             view.isRollingBackground = false;
             view.rollingDistance = 0;
-//            isRising = false;
-//            isFalling = true;
             deltaY = (int)((ObjectSizeManager.getInstance().getScreenH()/100)*((vy * GameSurfaceView.DELTA_TIME / 1000 + (g/2)* GameSurfaceView.DELTA_TIME* GameSurfaceView.DELTA_TIME/1000/1000)));
             y = y - deltaY;
             return;
@@ -221,14 +184,10 @@ public class Player implements IUpdate {
             deltaY = (int)((ObjectSizeManager.getInstance().getScreenH()/100)*((vy * GameSurfaceView.DELTA_TIME / 1000 + (g/2)* GameSurfaceView.DELTA_TIME* GameSurfaceView.DELTA_TIME/1000/1000)));
             y = y - deltaY;
         }
-//        if(y>MySurfaceView.screenH - frameH){
-//            y = MySurfaceView.screenH - frameH;
-//            isJumping = false;
-//            platform = floor;
-//        }
     }
 
-    public void playerDraw(Canvas canvas, Paint paint){
+    @Override
+    public void draw(Canvas canvas, Paint paint){
         if(!isJumping){
             int frame_x = currentFrame % frameCount * frameW;
             int frame_y = frameH * indexLine;
@@ -239,19 +198,14 @@ public class Player implements IUpdate {
                     frameW - leftPadding - rightPadding,frameH - topPadding - bottomPadding,
                     matrix,false);
             canvas.save();
-            canvas.clipRect(x,y,x+ObjectSizeManager.getInstance().getPlayerWidth(),
-                    y+ObjectSizeManager.getInstance().getPlayerHeight());
-            //canvas.clipRect(x,y,x+frameW,y+frameH);
+            canvas.clipRect(x,y,x+onScreenWidth,y+onScreenHeight);
             if(direction == DIRCTION_LEFT){
                 canvas.scale(-1,1,x+playerBitmapOnScreen.getWidth()/2,y+playerBitmapOnScreen.getHeight()/2);
-                //canvas.scale(-1,1,x-frame_x+frameW,y-frame_y+frameH);
                 canvas.drawBitmap(playerBitmapOnScreen,x,y,paint);
             }
             else{
                 canvas.drawBitmap(playerBitmapOnScreen,x,y,paint);
             }
-            //paint.setColor(Color.RED);
-            //canvas.drawRect(x,y,x+playerWidth,y+playerHeight,paint);
             canvas.restore();
         }
         else if (isJumping){
@@ -262,27 +216,22 @@ public class Player implements IUpdate {
                     frameW - leftPadding - rightPadding,frameH - topPadding - bottomPadding,
                     matrix,false);
             canvas.save();
-            canvas.clipRect(x,y,x+ObjectSizeManager.getInstance().getPlayerWidth(),
-                    y+ObjectSizeManager.getInstance().getPlayerHeight());
+            canvas.clipRect(x,y,x+onScreenWidth,y+onScreenHeight);
             //paint.setColor(Color.RED);
             if(direction == DIRCTION_LEFT){
                 canvas.scale(-1,1,x+playerBitmapJumpOnScreen.getWidth()/2,y+playerBitmapJumpOnScreen.getHeight()/2);
-                //canvas.scale(-1,1,x-frame_x+frameW,y-frame_y+frameH);
                 canvas.drawBitmap(playerBitmapJumpOnScreen,x,y,paint);
             }
             else{
                 canvas.drawBitmap(playerBitmapJumpOnScreen,x,y,paint);
             }
-            //canvas.drawRect(x,y,x+playerWidth,y+playerHeight,paint);
             canvas.restore();
         }
     }
 
     public boolean isOutOfPlatform(){
         int playerRealWidth = ObjectSizeManager.getInstance().getPlayerWidth();
-        if(x+playerRealWidth<platform.x || x>platform.x+platform.length){
-            Log.d("looping","now i am true too ,x:"+x+";playerRealWidth:"+playerRealWidth+";platformX:"
-            +platform.x+";platformLength:"+platform.length);
+        if(x+playerRealWidth<abstractPlatform.x || x>abstractPlatform.x+abstractPlatform.onScreenWidth){
             return true;
         }
         else {
@@ -290,12 +239,11 @@ public class Player implements IUpdate {
         }
     }
 
-    public boolean isCollisionWithPlatform(Platform platform){
+    public boolean isCollisionWithPlatform(AbstractPlatform abstractPlatform){
 
         if(vy<=0){
-            if(x+playerWidthOnScreen>platform.x && x<platform.x+platform.length){
-                if(Math.abs(y+playerHeightOnScreen - platform.y)<10){
-                    Log.d("looping","now i am true");
+            if(x+onScreenWidth>abstractPlatform.x && x<abstractPlatform.x+abstractPlatform.onScreenWidth){
+                if(Math.abs(y+onScreenHeight - abstractPlatform.y)<10){
                     return true;
                 }
                 else {
@@ -309,21 +257,6 @@ public class Player implements IUpdate {
         else {
             return false;
         }
-//        if(platform.isOnScreen){
-//            if (x >= platform.x && x >= platform.x+platform.length) {
-//                return false;
-//            } else if (x <= platform.x && x + frameW <= platform.x) {
-//                return false;
-//            } else if (y >= platform.y && y >= platform.x + Platform.THICKNESS) {
-//                return false;
-//            } else if (y <= platform.y && y + frameH <= platform.y) {
-//                return false;
-//            }
-//            return true;
-//        }
-//        else {
-//            return false;
-//        }
     }
 
     public boolean onTouchEvent(MotionEvent event, GameSurfaceView view) {
@@ -343,13 +276,12 @@ public class Player implements IUpdate {
                         .getString("sound_switch","off").equals("on")){
                     view.soundPool.play(view.jumpSound,1,1,0,0,1);
                 }
-                if(platform.getClass() == SpringPlatform.class){
+                if(abstractPlatform.getClass() == SpringPlatform.class){
                     //vy = 100;
                     vy = view.progress.getEndValue()*10 + 50 ;
-                    ((SpringPlatform)platform).playSpringAnimation = true;
+                    ((SpringPlatform)abstractPlatform).playSpringAnimation = true;
                 }
                 else{
-                    //vy = 50 ;
                     vy = view.progress.getEndValue()*10;
                 }
                 isJumping = true;

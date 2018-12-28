@@ -22,16 +22,6 @@ public class LRPlatform extends Platform {
         init_x = super.x;
     }
 
-//    @Override
-//    public void platformDraw(Canvas canvas,Paint paint) {
-////        Paint paint = new Paint();
-////        paint.setColor(Color.GREEN);
-//        if(isOnScreen) {
-//            canvas.drawBitmap(bmpPlatform,x,y,paint);
-//            //canvas.drawRect(x, y, x + length, y + THICKNESS, paint);
-//        }
-//    }
-
     @Override
     public void update(GameSurfaceView view) {
         if(direction == DIRCTION_RIGHT){
