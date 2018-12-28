@@ -25,7 +25,7 @@ public class Rank {
     public void draw(Canvas canvas, Paint paint){
         paint.setColor(Color.GREEN);
         paint.setTextSize(60);
-        canvas.drawText("层数:"+currentRank, ObjectSizeManager.getInstance().getScreenW()-400,90,paint);
+        canvas.drawText("层数:"+currentRank, ObjectSizeManager.getInstance().getScreenW()/3*2,90,paint);
     }
 
     public void addRank(){

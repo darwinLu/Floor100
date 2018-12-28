@@ -2,6 +2,7 @@ package com.example.lx.floor100.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -161,7 +162,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     @Override
                     public void onClick(View v) {
                         Toast.makeText(context,"最高分"+score,Toast.LENGTH_LONG).show();
-                        submitScore("Myuserid",score);
+                        submitScore("我",score);
                         Intent intent = new Intent(context, RankActivity.class);
                         context.startActivity(intent);
                     }
@@ -181,7 +182,14 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         new Thread(new Runnable(){
             @Override
             public void run() {
-                HttpURLConnection connection = null;
+                //保存成绩到sp
+                SharedPreferences option = getContext().getSharedPreferences("option", getContext().MODE_PRIVATE);
+                SharedPreferences.Editor editor = option.edit();
+                editor.putString("userId",userId);
+                editor.putInt("score",score);
+                editor.apply();
+                //上传得分到远程服务器
+                /*HttpURLConnection connection = null;
                 try {
                     String result = "";
                     URL url = new URL("http://106.12.211.73:8080/floor100_web/insertScore.do");
@@ -201,7 +209,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     if(connection != null) {
                         connection.disconnect();
                     }
-                }
+                }*/
             }
         }).start();
     }
@@ -222,7 +230,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         }
         if (Build.VERSION.SDK_INT >= 21) {
             soundPool = new SoundPool.Builder()
-                    .setMaxStreams(100)
+                    .setMaxStreams(50)
                     .build();
         } else {
             soundPool = new SoundPool(100, AudioManager.STREAM_MUSIC, 0);
@@ -295,7 +303,8 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         //设置主角初始所在的平台
         player.abstractPlatform = floor;
         //设置力量条
-        progress = new Progress(10,0,500,30,10);
+        int progressLength = objectSizeManager.getScreenW()/2/100*100;
+        progress = new Progress(10,0,progressLength,30,10);
         //设置积分牌
         rank = new Rank(0);
         //设置游戏开始标志位，开启主循环
