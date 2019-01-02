@@ -27,3 +27,5 @@
 
 游戏选项：可以关闭音乐和音效
 
+安装包：app文件夹下的com.example.lx.floor100-release-v1.0-1.apk
+
