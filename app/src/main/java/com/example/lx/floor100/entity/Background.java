@@ -56,12 +56,12 @@ public class Background {
         Matrix matrix = new Matrix();
         matrix.postScale(scaleFactor,scaleFactor);
         bmpBackGround1OnScreen = Bitmap.createBitmap(bmpBackGround1,
-                0,0,ObjectSizeManager.getInstance().getBackgroundWidth(),
-                ObjectSizeManager.getInstance().getBackgroundHeight(),
+                0,0,bmpBackGround1.getWidth(),
+                bmpBackGround1.getHeight(),
                 matrix,false);
         bmpBackGround2OnScreen = Bitmap.createBitmap(bmpBackGround2,
-                0,0,ObjectSizeManager.getInstance().getBackgroundWidth(),
-                ObjectSizeManager.getInstance().getBackgroundHeight(),
+                0,0,bmpBackGround2.getWidth(),
+                bmpBackGround2.getHeight(),
                 matrix,false);
     }
 

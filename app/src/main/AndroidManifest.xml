@@ -13,11 +13,13 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.MainActivity"
-            android:theme="@style/FullScreen" />
+            android:theme="@style/FullScreen"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activity.StartActivity"
             android:launchMode="singleTask"
-            android:theme="@style/FullScreen">
+            android:theme="@style/FullScreen"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,10 +28,12 @@
         </activity>
         <activity
             android:name=".activity.RankActivity"
-            android:theme="@style/FullScreen" />
+            android:theme="@style/FullScreen"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activity.OptionActivity"
-            android:theme="@style/FullScreen" />
+            android:theme="@style/FullScreen"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
