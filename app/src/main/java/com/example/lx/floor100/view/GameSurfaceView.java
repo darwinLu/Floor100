@@ -129,6 +129,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     public SoundPool soundPool;
     public int jumpSound;
     public int powerSound;
+    public int gameOverSound;
 
 
     public GameSurfaceView(final Context context) {
@@ -237,6 +238,7 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         }
         jumpSound = soundPool.load(this.getContext(),R.raw.jump,0);
         powerSound = soundPool.load(this.getContext(),R.raw.power,0);
+        gameOverSound = soundPool.load(this.getContext(),R.raw.game_over,0);
         //开始游戏
         gameLoopThread = new Thread(this);
         gameLoopThread.start();
@@ -407,6 +409,10 @@ public class GameSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     private void checkGameOver() {
         if(player.y>objectSizeManager.getInstance().getScreenH() + objectSizeManager.getPlayerHeight()){
+            if(this.getContext().getSharedPreferences("option", Context.MODE_PRIVATE)
+                    .getString("sound_switch","off").equals("on")){
+                this.soundPool.play(this.gameOverSound,1,1,0,0,1);
+            }
             Message message = new Message();
             Bundle bundle = new Bundle();
             bundle.putInt("score",rank.getCurrentRank());
